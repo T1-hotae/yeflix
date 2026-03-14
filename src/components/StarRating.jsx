@@ -23,7 +23,7 @@ export default function StarRating({ value, onChange, readonly = false, size = '
           onMouseLeave={() => !readonly && setHovered(0)}
           onClick={() => !readonly && onChange?.(star)}
         >
-          <span className={display >= star ? 'text-cinema-gold' : 'text-gray-600'}>
+          <span className={display >= star ? 'text-yellow-400' : 'text-gray-600'}>
             ★
           </span>
         </button>

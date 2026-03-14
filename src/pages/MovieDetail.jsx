@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Film, User, PenLine, ArrowLeft, Loader2 } from 'lucide-react';
 import {
   getMovieDetail,
   getWatchProviders,
@@ -22,7 +23,7 @@ export default function MovieDetail() {
   const { user, loginWithGoogle } = useAuth();
 
   const [movie, setMovie] = useState(null);
-  const [providers, setProviders] = useState(undefined); // undefined = 로딩 중
+  const [providers, setProviders] = useState(undefined);
   const [credits, setCredits] = useState(null);
   const [diary, setDiary] = useState(null);
   const [diaryLoading, setDiaryLoading] = useState(false);
@@ -94,7 +95,7 @@ export default function MovieDetail() {
   if (pageLoading) {
     return (
       <div className="min-h-screen bg-cinema-bg flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-cinema-gold/30 border-t-cinema-gold rounded-full animate-spin" />
+        <Loader2 size={36} className="text-cinema-gold animate-spin" />
       </div>
     );
   }
@@ -107,48 +108,34 @@ export default function MovieDetail() {
     );
   }
 
-  const backdropUrl = movie.backdrop_path
-    ? `${IMG_BASE_W780}${movie.backdrop_path}`
-    : null;
+  const backdropUrl = movie.backdrop_path ? `${IMG_BASE_W780}${movie.backdrop_path}` : null;
   const posterUrl = getPosterUrl(movie.poster_path, 'w342');
   const director = credits?.crew?.find((c) => c.job === 'Director');
   const cast = credits?.cast?.slice(0, 8) ?? [];
 
   return (
     <div className="min-h-screen bg-cinema-bg">
-      {/* 배경 backdrop */}
       {backdropUrl && (
         <div className="absolute top-0 left-0 right-0 h-[500px] overflow-hidden -z-10">
-          <img
-            src={backdropUrl}
-            alt=""
-            className="w-full h-full object-cover opacity-20 blur-sm"
-          />
+          <img src={backdropUrl} alt="" className="w-full h-full object-cover opacity-20 blur-sm" />
           <div className="absolute inset-0 bg-gradient-to-b from-cinema-bg/30 via-cinema-bg/60 to-cinema-bg" />
         </div>
       )}
 
       <div className="max-w-5xl mx-auto px-4 py-10">
-        {/* 상단: 포스터 + 정보 + 보러가기 */}
+        {/* 포스터 + 정보 */}
         <div className="flex flex-col md:flex-row gap-8">
-          {/* 포스터 */}
           <div className="w-48 md:w-56 flex-shrink-0 mx-auto md:mx-0">
             {posterUrl ? (
-              <img
-                src={posterUrl}
-                alt={movie.title}
-                className="w-full rounded-2xl shadow-2xl"
-              />
+              <img src={posterUrl} alt={movie.title} className="w-full rounded-2xl shadow-2xl" />
             ) : (
-              <div className="w-full aspect-[2/3] rounded-2xl bg-cinema-card flex items-center justify-center text-5xl">
-                🎬
+              <div className="w-full aspect-[2/3] rounded-2xl bg-cinema-card flex items-center justify-center text-cinema-muted">
+                <Film size={48} />
               </div>
             )}
           </div>
 
-          {/* 영화 정보 */}
           <div className="flex-1 space-y-4">
-            {/* 제목 */}
             <div>
               <h1 className="text-3xl font-bold text-white leading-tight">{movie.title}</h1>
               {movie.original_title !== movie.title && (
@@ -156,50 +143,30 @@ export default function MovieDetail() {
               )}
             </div>
 
-            {/* 메타 정보 */}
             <div className="flex flex-wrap items-center gap-3 text-sm text-cinema-muted">
               {movie.release_date && <span>{getYear(movie.release_date)}</span>}
-              {movie.runtime > 0 && (
-                <>
-                  <span className="text-white/20">|</span>
-                  <span>{formatRuntime(movie.runtime)}</span>
-                </>
-              )}
-              {movie.genres?.length > 0 && (
-                <>
-                  <span className="text-white/20">|</span>
-                  <span>{formatGenres(movie.genres)}</span>
-                </>
-              )}
+              {movie.runtime > 0 && <><span className="text-white/20">|</span><span>{formatRuntime(movie.runtime)}</span></>}
+              {movie.genres?.length > 0 && <><span className="text-white/20">|</span><span>{formatGenres(movie.genres)}</span></>}
             </div>
 
-            {/* TMDB 평점 */}
             <div className="flex items-center gap-2">
-              <span className="text-cinema-gold text-xl font-bold">★</span>
-              <span className="text-white font-bold text-xl">
-                {formatRating(movie.vote_average)}
-              </span>
+              <span className="text-yellow-400 text-xl font-bold">★</span>
+              <span className="text-white font-bold text-xl">{formatRating(movie.vote_average)}</span>
               <span className="text-cinema-muted text-sm">/ 10</span>
-              <span className="text-cinema-muted text-xs ml-1">
-                ({movie.vote_count?.toLocaleString()}명)
-              </span>
+              <span className="text-cinema-muted text-xs ml-1">({movie.vote_count?.toLocaleString()}명)</span>
             </div>
 
-            {/* 감독 */}
             {director && (
               <p className="text-sm text-cinema-muted">
                 감독: <span className="text-white">{director.name}</span>
               </p>
             )}
 
-            {/* 줄거리 */}
             {movie.overview && (
-              <p className="text-gray-300 text-sm leading-relaxed line-clamp-4">
-                {movie.overview}
-              </p>
+              <p className="text-gray-300 text-sm leading-relaxed line-clamp-4">{movie.overview}</p>
             )}
 
-            {/* ★ 보러가기 섹션 (네이버 스타일) ★ */}
+            {/* 보러가기 */}
             <div className="pt-2">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-white font-semibold text-sm">보러가기</span>
@@ -212,7 +179,7 @@ export default function MovieDetail() {
                   ))}
                 </div>
               ) : (
-                <WatchProviders providers={providers} />
+                <WatchProviders providers={providers} movieTitle={movie.title} />
               )}
             </div>
           </div>
@@ -233,14 +200,12 @@ export default function MovieDetail() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-2xl text-cinema-muted">
-                        👤
+                      <div className="w-full h-full flex items-center justify-center text-cinema-muted">
+                        <User size={28} />
                       </div>
                     )}
                   </div>
-                  <p className="text-white text-xs font-medium leading-tight line-clamp-1">
-                    {actor.name}
-                  </p>
+                  <p className="text-white text-xs font-medium leading-tight line-clamp-1">{actor.name}</p>
                   <p className="text-cinema-muted text-xs line-clamp-1">{actor.character}</p>
                 </div>
               ))}
@@ -248,17 +213,15 @@ export default function MovieDetail() {
           </div>
         )}
 
-        {/* 구분선 */}
         <div className="border-t border-white/10 mt-10 mb-8" />
 
-        {/* ★ 내 감상 일기 섹션 ★ */}
+        {/* 내 감상 일기 */}
         <div>
           <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            ✍️ 내 감상 일기
+            <PenLine size={20} /> 내 감상 일기
           </h2>
 
           {!user ? (
-            /* 비로그인 */
             <div className="bg-cinema-card rounded-2xl p-8 text-center border border-white/5">
               <p className="text-cinema-muted mb-4">로그인 후 감상 일기를 작성할 수 있습니다.</p>
               <button
@@ -269,14 +232,11 @@ export default function MovieDetail() {
               </button>
             </div>
           ) : diary && !editing ? (
-            /* 일기 보기 */
             <div className="bg-cinema-card rounded-2xl p-6 border border-white/5 space-y-4">
               <div className="flex items-start justify-between">
                 <div>
                   <StarRating value={diary.rating} readonly size="md" />
-                  <p className="text-cinema-muted text-xs mt-1">
-                    {diary.watchedDate} 관람
-                  </p>
+                  <p className="text-cinema-muted text-xs mt-1">{diary.watchedDate} 관람</p>
                 </div>
                 <button
                   onClick={() => setEditing(true)}
@@ -287,18 +247,13 @@ export default function MovieDetail() {
               </div>
 
               {diary.content && (
-                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-                  {diary.content}
-                </p>
+                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{diary.content}</p>
               )}
 
               {diary.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {diary.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs px-2.5 py-1 rounded-full bg-cinema-gold/10 text-cinema-gold border border-cinema-gold/20"
-                    >
+                    <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-cinema-gold/10 text-cinema-gold border border-cinema-gold/20">
                       #{tag}
                     </span>
                   ))}
@@ -306,14 +261,13 @@ export default function MovieDetail() {
               )}
             </div>
           ) : (
-            /* 일기 작성 / 수정 */
             <div className="bg-cinema-card rounded-2xl p-6 border border-white/5">
               {diary && editing && (
                 <button
                   onClick={() => setEditing(false)}
-                  className="text-cinema-muted text-sm mb-4 hover:text-white transition"
+                  className="flex items-center gap-1 text-cinema-muted text-sm mb-4 hover:text-white transition"
                 >
-                  ← 취소
+                  <ArrowLeft size={14} /> 취소
                 </button>
               )}
               <DiaryForm

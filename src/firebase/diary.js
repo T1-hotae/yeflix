@@ -7,7 +7,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './config';
@@ -36,15 +35,15 @@ export const getDiary = async (userId, movieId) => {
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 };
 
-// 내 모든 일기 가져오기 (최신순)
+// 내 모든 일기 가져오기 (최신순 - 클라이언트 정렬로 복합 인덱스 불필요)
 export const getMyDiaries = async (userId) => {
   const q = query(
     collection(db, COLLECTION),
-    where('userId', '==', userId),
-    orderBy('updatedAt', 'desc')
+    where('userId', '==', userId)
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return docs.sort((a, b) => (b.updatedAt?.seconds ?? 0) - (a.updatedAt?.seconds ?? 0));
 };
 
 // 일기 삭제

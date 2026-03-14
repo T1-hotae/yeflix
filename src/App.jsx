@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import MovieDetail from './pages/MovieDetail';
 import MyDiary from './pages/MyDiary';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/movie/:id" element={<MovieDetail />} />
         <Route path="/diary" element={<MyDiary />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>
   );

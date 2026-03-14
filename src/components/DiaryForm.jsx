@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Tag, X, Plus } from 'lucide-react';
 import StarRating from './StarRating';
 
 const PRESET_TAGS = ['감동적', '재미있음', '무서움', '지루함', '명작', 'OST최고', '반전있음', '또보고싶어', '눈물남', '생각할거리'];
@@ -12,27 +13,19 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
   );
   const [tagInput, setTagInput] = useState('');
 
-  const toggleTag = (tag) => {
-    setTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
+  const toggleTag = (tag) =>
+    setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]);
 
   const addCustomTag = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     const t = tagInput.trim().replace(/^#/, '');
-    if (t && !tags.includes(t) && tags.length < 10) {
-      setTags((prev) => [...prev, t]);
-    }
+    if (t && !tags.includes(t) && tags.length < 10) setTags((prev) => [...prev, t]);
     setTagInput('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (rating === 0) {
-      alert('별점을 선택해주세요.');
-      return;
-    }
+    if (rating === 0) { alert('별점을 선택해주세요.'); return; }
     onSave({ rating, content, tags, watchedDate });
   };
 
@@ -75,7 +68,9 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
 
       {/* 태그 */}
       <div>
-        <label className="block text-sm text-cinema-muted mb-2 font-medium">태그</label>
+        <label className="flex items-center gap-1.5 text-sm text-cinema-muted mb-2 font-medium">
+          <Tag size={13} /> 태그
+        </label>
         <div className="flex flex-wrap gap-2 mb-3">
           {PRESET_TAGS.map((tag) => (
             <button
@@ -93,14 +88,15 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
           ))}
         </div>
 
-        {/* 직접 입력 태그 */}
         {tags.filter((t) => !PRESET_TAGS.includes(t)).map((tag) => (
           <span
             key={tag}
             className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-cinema-accent/20 border border-cinema-accent/40 text-cinema-accent mr-2 mb-2"
           >
             #{tag}
-            <button type="button" onClick={() => toggleTag(tag)} className="hover:text-white">×</button>
+            <button type="button" onClick={() => toggleTag(tag)}>
+              <X size={12} />
+            </button>
           </span>
         ))}
 
@@ -116,9 +112,9 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
           <button
             type="button"
             onClick={addCustomTag}
-            className="text-sm px-3 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
+            className="flex items-center gap-1 text-sm px-3 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
           >
-            추가
+            <Plus size={14} /> 추가
           </button>
         </div>
       </div>
@@ -128,7 +124,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-cinema-gold text-black font-bold py-3 rounded-xl hover:bg-yellow-400 transition disabled:opacity-50"
+          className="flex-1 bg-cinema-gold text-white font-bold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50"
         >
           {loading ? '저장 중...' : initial ? '수정하기' : '일기 저장'}
         </button>

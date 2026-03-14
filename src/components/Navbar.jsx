@@ -1,17 +1,50 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, BookOpen, Settings, LogOut } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user, loginWithGoogle, logout } = useAuth();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (!query.trim()) return;
     navigate(`/?search=${encodeURIComponent(query.trim())}`);
-    setQuery('');
+    setQuery("");
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleMyDiary = () => {
+    setDropdownOpen(false);
+    navigate("/");
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("switch-tab", { detail: "my_diary" }),
+      );
+    }, 50);
+  };
+
+  const handleSettings = () => {
+    setDropdownOpen(false);
+    navigate("/settings");
+  };
+
+  const handleLogout = async () => {
+    setDropdownOpen(false);
+    await logout();
   };
 
   return (
@@ -22,7 +55,7 @@ export default function Navbar() {
           to="/"
           className="text-xl font-bold text-cinema-gold whitespace-nowrap tracking-wide"
         >
-          🎬 영화일기
+          Yeflix
         </Link>
 
         {/* 검색바 */}
@@ -37,34 +70,66 @@ export default function Navbar() {
             />
             <button
               type="submit"
-              className="px-4 text-cinema-muted hover:text-cinema-gold transition text-lg"
+              className="px-4 text-cinema-muted hover:text-cinema-gold transition"
             >
-              🔍
+              <Search size={16} />
             </button>
           </div>
         </form>
 
-        {/* 메뉴 */}
+        {/* 우측 메뉴 */}
         <div className="flex items-center gap-3 ml-auto">
           {user ? (
-            <>
-              <Link
-                to="/diary"
-                className="text-sm text-gray-300 hover:text-cinema-gold transition font-medium"
-              >
-                내 일기
-              </Link>
+            <div className="relative" ref={dropdownRef}>
               <button
-                onClick={logout}
-                className="flex items-center gap-2 text-sm text-cinema-muted hover:text-white transition"
+                onClick={() => setDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-2 hover:opacity-80 transition"
               >
                 <img
                   src={user.photoURL}
                   alt="프로필"
-                  className="w-8 h-8 rounded-full border border-white/20"
+                  className="w-9 h-9 rounded-full border-2 border-cinema-gold/40"
                 />
               </button>
-            </>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 top-12 w-52 bg-cinema-card border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
+                  {/* 사용자 정보 */}
+                  <div className="px-4 py-3 border-b border-white/10">
+                    <p className="text-white text-sm font-semibold truncate">
+                      {user.displayName}
+                    </p>
+                    <p className="text-cinema-muted text-xs truncate">
+                      {user.email}
+                    </p>
+                  </div>
+
+                  <div className="py-1">
+                    <button
+                      onClick={handleMyDiary}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
+                    >
+                      <BookOpen size={15} className="text-cinema-muted" /> 내
+                      정보
+                    </button>
+                    <button
+                      onClick={handleSettings}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
+                    >
+                      <Settings size={15} className="text-cinema-muted" /> 설정
+                    </button>
+                    <div className="border-t border-white/10 mt-1 pt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-cinema-gold hover:bg-cinema-gold/10 transition text-left"
+                      >
+                        <LogOut size={15} /> 로그아웃
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <button
               onClick={loginWithGoogle}
