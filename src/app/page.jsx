@@ -2,16 +2,19 @@
 
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Film, BookOpen, Plus } from 'lucide-react';
+import { Film, BookOpen, Plus, Bookmark } from 'lucide-react';
 import { getNowPlaying, searchMovies } from '../api/tmdb';
 import { getMyDiaries, getMyMovieIds } from '../firebase/diary';
+import { getWatchlist, removeFromWatchlist, getWatchlistMovieIds } from '../firebase/watchlist';
 import { useAuth } from '../context/AuthContext';
 import MovieCard from '../components/MovieCard';
 import DiaryCard from '../components/DiaryCard';
+import WatchlistCard from '../components/WatchlistCard';
 import AddMovieModal from '../components/AddMovieModal';
 
 const TABS = [
   { id: 'my_diary', label: '내 일기' },
+  { id: 'watchlist', label: '볼영화' },
   { id: 'now_playing', label: '현재 상영 중' },
 ];
 
@@ -27,6 +30,9 @@ function HomeContent() {
   const [myMovieIds, setMyMovieIds] = useState(new Set());
   const [myDiaries, setMyDiaries] = useState([]);
   const [diariesLoading, setDiariesLoading] = useState(false);
+  const [watchlist, setWatchlist] = useState([]);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [watchlistMovieIds, setWatchlistMovieIds] = useState(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
 
   const { user, loginWithGoogle } = useAuth();
@@ -40,8 +46,9 @@ function HomeContent() {
 
   // 내가 일기 쓴 영화 ID 목록
   useEffect(() => {
-    if (!user) { setMyMovieIds(new Set()); return; }
+    if (!user) { setMyMovieIds(new Set()); setWatchlistMovieIds(new Set()); return; }
     getMyMovieIds(user.uid).then(setMyMovieIds).catch(console.error);
+    getWatchlistMovieIds(user.uid).then(setWatchlistMovieIds).catch(console.error);
   }, [user]);
 
   // 내 일기 목록
@@ -53,6 +60,23 @@ function HomeContent() {
       .catch(console.error)
       .finally(() => setDiariesLoading(false));
   }, [tab, user]);
+
+  // 볼영화 찜 목록
+  useEffect(() => {
+    if (tab !== 'watchlist' || !user) return;
+    setWatchlistLoading(true);
+    getWatchlist(user.uid)
+      .then(setWatchlist)
+      .catch(console.error)
+      .finally(() => setWatchlistLoading(false));
+  }, [tab, user]);
+
+  const handleRemoveFromWatchlist = async (movieId) => {
+    if (!user) return;
+    await removeFromWatchlist(user.uid, movieId);
+    setWatchlist((prev) => prev.filter((item) => item.movieId !== movieId));
+    setWatchlistMovieIds((prev) => { const s = new Set(prev); s.delete(movieId); return s; });
+  };
 
   const fetchMovies = useCallback(async (currentPage, reset = false) => {
     setLoading(true);
@@ -115,6 +139,11 @@ function HomeContent() {
                       {myDiaries.length}
                     </span>
                   )}
+                  {t.id === 'watchlist' && watchlistMovieIds.size > 0 && (
+                    <span className="ml-1.5 text-xs bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded-full">
+                      {watchlistMovieIds.size}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -141,6 +170,7 @@ function HomeContent() {
                       key={`${movie.id}-${movie.title}`}
                       movie={movie}
                       hasDiary={myMovieIds.has(movie.id)}
+                      hasWatchlist={watchlistMovieIds.has(movie.id)}
                     />
                   ))}
                 </div>
@@ -165,6 +195,43 @@ function HomeContent() {
             ) : (
               <div className="text-center py-20 text-cinema-muted">
                 {searchQuery ? '검색 결과가 없습니다.' : '영화를 불러오는 중...'}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* 볼영화 탭 */}
+        {!searchQuery && tab === 'watchlist' && (
+          <>
+            {!user ? (
+              <div className="text-center py-20">
+                <Bookmark size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
+                <p className="text-white font-semibold text-lg mb-2">볼영화 찜 목록</p>
+                <p className="text-cinema-muted mb-6">로그인 후 볼영화를 찜할 수 있습니다.</p>
+                <button
+                  onClick={loginWithGoogle}
+                  className="bg-white text-gray-900 font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition text-sm"
+                >
+                  Google로 로그인
+                </button>
+              </div>
+            ) : watchlistLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="aspect-[2/3] rounded-xl bg-cinema-card animate-pulse" />
+                ))}
+              </div>
+            ) : watchlist.length === 0 ? (
+              <div className="text-center py-20">
+                <Bookmark size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
+                <p className="text-white font-semibold text-lg mb-2">찜한 영화가 없어요</p>
+                <p className="text-cinema-muted">영화 상세 페이지에서 북마크 버튼을 눌러 찜해보세요!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {watchlist.map((item) => (
+                  <WatchlistCard key={item.id} item={item} onRemove={handleRemoveFromWatchlist} />
+                ))}
               </div>
             )}
           </>

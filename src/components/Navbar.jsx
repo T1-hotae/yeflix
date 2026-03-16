@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, BookOpen, Settings, LogOut } from "lucide-react";
+import { Search, BookOpen, Settings, LogOut, Bookmark } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
@@ -36,6 +36,16 @@ export default function Navbar() {
     setTimeout(() => {
       window.dispatchEvent(
         new CustomEvent("switch-tab", { detail: "my_diary" }),
+      );
+    }, 50);
+  };
+
+  const handleWatchlist = () => {
+    setDropdownOpen(false);
+    router.push("/");
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("switch-tab", { detail: "watchlist" }),
       );
     }, 50);
   };
@@ -113,7 +123,14 @@ export default function Navbar() {
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
                     >
                       <BookOpen size={15} className="text-cinema-muted" /> 내
-                      정보
+                      일기
+                    </button>
+                    <button
+                      onClick={handleWatchlist}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
+                    >
+                      <Bookmark size={15} className="text-cinema-muted" />{" "}
+                      볼영화
                     </button>
                     <button
                       onClick={handleSettings}

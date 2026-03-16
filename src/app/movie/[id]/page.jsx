@@ -15,10 +15,12 @@ import {
   IMG_BASE_W780,
 } from '../../../api/tmdb';
 import { saveDiary, getDiary, deleteDiary } from '../../../firebase/diary';
+import { addToWatchlist, removeFromWatchlist, isInWatchlist } from '../../../firebase/watchlist';
 import { useAuth } from '../../../context/AuthContext';
 import WatchProviders from '../../../components/WatchProviders';
 import DiaryForm from '../../../components/DiaryForm';
 import StarRating from '../../../components/StarRating';
+import { Bookmark } from 'lucide-react';
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -31,6 +33,8 @@ export default function MovieDetail() {
   const [diaryLoading, setDiaryLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,7 +60,26 @@ export default function MovieDetail() {
   useEffect(() => {
     if (!user || !id) return;
     getDiary(user.uid, id).then(setDiary).catch(console.error);
+    isInWatchlist(user.uid, id).then(setInWatchlist).catch(console.error);
   }, [user, id]);
+
+  const toggleWatchlist = async () => {
+    if (!user || watchlistLoading) return;
+    setWatchlistLoading(true);
+    try {
+      if (inWatchlist) {
+        await removeFromWatchlist(user.uid, id);
+        setInWatchlist(false);
+      } else {
+        await addToWatchlist(user.uid, id, { title: movie.title, poster_path: movie.poster_path });
+        setInWatchlist(true);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setWatchlistLoading(false);
+    }
+  };
 
   const handleSave = async (data) => {
     if (!user) return;
@@ -72,6 +95,10 @@ export default function MovieDetail() {
       const updated = await getDiary(user.uid, id);
       setDiary(updated);
       setEditing(false);
+      if (inWatchlist) {
+        await removeFromWatchlist(user.uid, id);
+        setInWatchlist(false);
+      }
     } catch (err) {
       console.error(err);
       alert('저장 중 오류가 발생했습니다.');
@@ -139,7 +166,23 @@ export default function MovieDetail() {
 
           <div className="flex-1 space-y-4">
             <div>
-              <h1 className="text-3xl font-bold text-white leading-tight">{movie.title}</h1>
+              <div className="flex items-start gap-3">
+                <h1 className="text-3xl font-bold text-white leading-tight flex-1">{movie.title}</h1>
+                {user && (
+                  <button
+                    onClick={toggleWatchlist}
+                    disabled={watchlistLoading}
+                    className={`flex-shrink-0 mt-1 p-2 rounded-full border transition ${
+                      inWatchlist
+                        ? 'bg-blue-500/20 border-blue-400 text-blue-400 hover:bg-red-500/20 hover:border-red-400 hover:text-red-400'
+                        : 'bg-white/5 border-white/20 text-cinema-muted hover:bg-blue-500/20 hover:border-blue-400 hover:text-blue-400'
+                    } disabled:opacity-50`}
+                    title={inWatchlist ? '찜 취소' : '볼영화 찜하기'}
+                  >
+                    <Bookmark size={18} fill={inWatchlist ? 'currentColor' : 'none'} />
+                  </button>
+                )}
+              </div>
               {movie.original_title !== movie.title && (
                 <p className="text-cinema-muted text-sm mt-1">{movie.original_title}</p>
               )}

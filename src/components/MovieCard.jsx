@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Film, PenLine } from "lucide-react";
+import { Film, PenLine, Bookmark } from "lucide-react";
 import { getPosterUrl, formatRating, getYear } from "../api/tmdb";
 
-export default function MovieCard({ movie, hasDiary = false }) {
+export default function MovieCard({ movie, hasDiary = false, hasWatchlist = false }) {
   const poster = getPosterUrl(movie.poster_path);
 
   return (
@@ -30,6 +30,11 @@ export default function MovieCard({ movie, hasDiary = false }) {
       {hasDiary && (
         <span className="absolute top-2 right-2 bg-cinema-gold/90 text-white p-1 rounded-full shadow">
           <PenLine size={11} />
+        </span>
+      )}
+      {!hasDiary && hasWatchlist && (
+        <span className="absolute top-2 right-2 bg-blue-500/90 text-white p-1 rounded-full shadow">
+          <Bookmark size={11} fill="white" />
         </span>
       )}
 
