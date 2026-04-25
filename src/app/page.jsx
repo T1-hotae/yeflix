@@ -122,12 +122,12 @@ function HomeContent() {
           </div>
         ) : (
           <div className="flex items-center justify-between mb-6 border-b border-white/10">
-            <div className="flex gap-4">
+            <div className="flex gap-2 sm:gap-4 min-w-0 flex-1">
               {TABS.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`pb-3 text-sm font-semibold transition border-b-2 -mb-px ${
+                  className={`pb-3 text-xs sm:text-sm font-semibold transition border-b-2 -mb-px whitespace-nowrap shrink-0 ${
                     tab === t.id
                       ? 'border-cinema-gold text-cinema-gold'
                       : 'border-transparent text-cinema-muted hover:text-white'
@@ -151,9 +151,10 @@ function HomeContent() {
             {tab === 'my_diary' && (
               <button
                 onClick={() => user ? setShowAddModal(true) : loginWithGoogle()}
-                className="flex items-center gap-1.5 bg-cinema-gold text-white text-sm font-bold px-4 py-2 rounded-full hover:opacity-90 transition mb-3"
+                className="flex items-center gap-1.5 bg-cinema-gold text-white text-sm font-bold px-2.5 sm:px-4 py-2 rounded-full hover:opacity-90 transition mb-3 shrink-0 ml-2"
               >
-                <Plus size={15} /> 영화 추가하기
+                <Plus size={15} />
+                <span className="hidden sm:inline">영화 추가하기</span>
               </button>
             )}
           </div>

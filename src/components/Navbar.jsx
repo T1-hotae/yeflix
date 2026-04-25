@@ -62,7 +62,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-cinema-card/95 backdrop-blur border-b border-white/5 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
+      <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center gap-x-4 gap-y-2 py-3 md:py-0 md:h-16">
         {/* 로고 */}
         <Link
           href="/"
@@ -72,7 +72,7 @@ export default function Navbar() {
         </Link>
 
         {/* 검색바 */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-lg">
+        <form onSubmit={handleSearch} className="order-3 md:order-2 w-full md:w-auto md:flex-1 md:max-w-lg">
           <div className="flex bg-white/10 rounded-full overflow-hidden border border-white/10 focus-within:border-cinema-gold/50 transition">
             <input
               type="text"
@@ -91,7 +91,7 @@ export default function Navbar() {
         </form>
 
         {/* 우측 메뉴 */}
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="order-2 md:order-3 flex items-center gap-3 ml-auto">
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
