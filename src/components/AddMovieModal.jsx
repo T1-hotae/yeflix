@@ -44,9 +44,9 @@ export default function AddMovieModal({ onClose }) {
       className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-20 px-4"
       onClick={handleBackdrop}
     >
-      <div className="w-full max-w-2xl bg-cinema-card rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+      <div className="w-full max-w-2xl bg-cinema-card rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
         {/* 검색창 */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/20">
           <Search size={18} className="text-cinema-muted flex-shrink-0" />
           <input
             ref={inputRef}
@@ -89,7 +89,7 @@ export default function AddMovieModal({ onClose }) {
             <button
               key={movie.id}
               onClick={() => handleSelect(movie)}
-              className="w-full flex items-center gap-4 px-5 py-3 hover:bg-white/5 transition text-left border-b border-white/5 last:border-0"
+              className="w-full flex items-center gap-4 px-5 py-3 hover:bg-white/5 transition text-left border-b border-white/15 last:border-0"
             >
               <div className="w-10 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-cinema-surface">
                 {movie.poster_path ? (

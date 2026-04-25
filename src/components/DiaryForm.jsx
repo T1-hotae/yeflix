@@ -48,7 +48,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
           type="date"
           value={watchedDate}
           onChange={(e) => setWatchedDate(e.target.value)}
-          className="bg-cinema-surface text-white text-sm px-3 py-2 rounded-lg border border-white/10 focus:border-cinema-gold/50 outline-none transition"
+          className="bg-cinema-surface text-white text-sm px-3 py-2 rounded-lg border border-white/20 focus:border-cinema-gold/50 outline-none transition"
         />
       </div>
 
@@ -72,7 +72,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
           onChange={(e) => setContent(e.target.value)}
           placeholder="이 영화에 대한 솔직한 감상을 적어보세요..."
           rows={6}
-          className="w-full bg-cinema-surface text-white text-sm px-4 py-4 rounded-xl border border-white/10 focus:border-cinema-gold/50 outline-none transition resize-none placeholder-cinema-muted leading-relaxed overflow-hidden"
+          className="w-full bg-cinema-surface text-white text-sm px-4 py-4 rounded-xl border border-white/20 focus:border-cinema-gold/50 outline-none transition resize-none placeholder-cinema-muted leading-relaxed overflow-hidden"
         />
         <p className="text-xs text-cinema-muted text-right mt-1">{content.length}자</p>
       </div>
@@ -91,7 +91,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
               className={`text-xs px-3 py-1 rounded-full border transition ${
                 tags.includes(tag)
                   ? 'bg-cinema-gold/20 border-cinema-gold text-cinema-gold'
-                  : 'bg-white/5 border-white/10 text-cinema-muted hover:border-white/30'
+                  : 'bg-white/5 border-white/20 text-cinema-muted hover:border-white/30'
               }`}
             >
               #{tag}
@@ -118,7 +118,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addCustomTag(e)}
             placeholder="#직접입력"
-            className="flex-1 bg-cinema-surface text-white text-sm px-3 py-2 rounded-lg border border-white/10 focus:border-cinema-gold/50 outline-none transition placeholder-cinema-muted"
+            className="flex-1 bg-cinema-surface text-white text-sm px-3 py-2 rounded-lg border border-white/20 focus:border-cinema-gold/50 outline-none transition placeholder-cinema-muted"
           />
           <button
             type="button"

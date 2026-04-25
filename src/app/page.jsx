@@ -121,7 +121,7 @@ function HomeContent() {
             <p className="text-cinema-muted text-sm mt-1">{movies.length}개의 영화</p>
           </div>
         ) : (
-          <div className="flex items-center justify-between mb-6 border-b border-white/10">
+          <div className="flex items-center justify-between mb-6 border-b border-white/20">
             <div className="flex gap-2 sm:gap-4 min-w-0 flex-1">
               {TABS.map((t) => (
                 <button
@@ -180,7 +180,7 @@ function HomeContent() {
                     <button
                       onClick={loadMore}
                       disabled={loading}
-                      className="px-8 py-3 bg-cinema-card border border-white/10 text-white rounded-full hover:bg-white/10 transition text-sm font-medium disabled:opacity-50"
+                      className="px-8 py-3 bg-cinema-card border border-white/20 text-white rounded-full hover:bg-white/10 transition text-sm font-medium disabled:opacity-50"
                     >
                       {loading ? '불러오는 중...' : '더 보기'}
                     </button>

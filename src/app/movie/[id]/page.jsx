@@ -258,7 +258,7 @@ export default function MovieDetail() {
           </div>
         )}
 
-        <div className="border-t border-white/10 mt-10 mb-8" />
+        <div className="border-t border-white/20 mt-10 mb-8" />
 
         {/* 내 감상 일기 */}
         <div>
@@ -267,7 +267,7 @@ export default function MovieDetail() {
           </h2>
 
           {!user ? (
-            <div className="bg-cinema-card rounded-2xl p-8 text-center border border-white/5">
+            <div className="bg-cinema-card rounded-2xl p-8 text-center border border-white/20">
               <p className="text-cinema-muted mb-4">로그인 후 감상 일기를 작성할 수 있습니다.</p>
               <button
                 onClick={loginWithGoogle}
@@ -277,7 +277,7 @@ export default function MovieDetail() {
               </button>
             </div>
           ) : diary && !editing ? (
-            <div className="bg-cinema-card rounded-2xl p-6 border border-white/5 space-y-4">
+            <div className="bg-cinema-card rounded-2xl p-6 border border-white/20 space-y-4">
               <div className="flex items-start justify-between">
                 <div>
                   <StarRating value={diary.rating} readonly size="md" />
@@ -285,7 +285,7 @@ export default function MovieDetail() {
                 </div>
                 <button
                   onClick={() => setEditing(true)}
-                  className="text-xs text-cinema-muted hover:text-white transition px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/30"
+                  className="text-xs text-cinema-muted hover:text-white transition px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/30"
                 >
                   수정
                 </button>
@@ -306,7 +306,7 @@ export default function MovieDetail() {
               )}
             </div>
           ) : (
-            <div className="bg-cinema-card rounded-2xl p-6 border border-white/5">
+            <div className="bg-cinema-card rounded-2xl p-6 border border-white/20">
               {diary && editing && (
                 <button
                   onClick={() => setEditing(false)}

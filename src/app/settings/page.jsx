@@ -38,7 +38,7 @@ export default function Settings() {
         </div>
 
         {/* 프로필 */}
-        <div className="bg-cinema-card rounded-2xl p-6 border border-white/5 mb-4">
+        <div className="bg-cinema-card rounded-2xl p-6 border border-white/20 mb-4">
           <p className="text-xs text-cinema-muted uppercase tracking-wider font-semibold mb-4">
             내 계정
           </p>
@@ -58,7 +58,7 @@ export default function Settings() {
         </div>
 
         {/* 앱 설정 */}
-        <div className="bg-cinema-card rounded-2xl border border-white/5 mb-4 overflow-hidden">
+        <div className="bg-cinema-card rounded-2xl border border-white/20 mb-4 overflow-hidden">
           <p className="text-xs text-cinema-muted uppercase tracking-wider font-semibold px-6 pt-5 pb-3">
             앱 설정
           </p>
@@ -71,7 +71,7 @@ export default function Settings() {
         </div>
 
         {/* 정보 */}
-        <div className="bg-cinema-card rounded-2xl border border-white/5 mb-6 overflow-hidden">
+        <div className="bg-cinema-card rounded-2xl border border-white/20 mb-6 overflow-hidden">
           <p className="text-xs text-cinema-muted uppercase tracking-wider font-semibold px-6 pt-5 pb-3">
             정보
           </p>
@@ -105,7 +105,7 @@ export default function Settings() {
 
 function SettingRow({ icon, label, value }) {
   return (
-    <div className="flex items-center justify-between px-6 py-3.5 border-t border-white/5 first:border-0 opacity-60">
+    <div className="flex items-center justify-between px-6 py-3.5 border-t border-white/20 first:border-0 opacity-60">
       <div className="flex items-center gap-2.5 text-white text-sm">
         <span className="text-cinema-muted">{icon}</span>
         {label}

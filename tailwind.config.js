@@ -6,11 +6,11 @@ module.exports = {
       colors: {
         cinema: {
           bg: '#0d0d0d',
-          card: '#1a1a2e',
-          surface: '#16213e',
+          card: '#1a1a1a',
+          surface: '#111111',
           accent: '#e94560',
           gold: '#e50914',
-          muted: '#8892a4',
+          muted: '#9ca3af',
         },
       },
     },
