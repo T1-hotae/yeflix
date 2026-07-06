@@ -30,7 +30,7 @@ export const getUpcoming = (page = 1) =>
 
 // 영화 검색
 export const searchMovies = (query, page = 1) =>
-  fetcher('/search/movie', { query, page });
+  fetcher('/search/movie', { query: query.trim().replace(/\s+/g, ' '), page });
 
 // 영화 상세 정보
 export const getMovieDetail = (id) =>

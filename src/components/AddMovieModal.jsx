@@ -31,6 +31,7 @@ export default function AddMovieModal({ onClose }) {
   }, [query]);
 
   const handleSelect = (movie) => {
+    inputRef.current?.blur();
     router.push(`/movie/${movie.id}`);
     onClose();
   };
@@ -54,6 +55,8 @@ export default function AddMovieModal({ onClose }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="본 영화 제목을 검색하세요..."
+            inputMode="search"
+            enterKeyHint="search"
             className="flex-1 bg-transparent text-white text-base outline-none placeholder-cinema-muted"
           />
           {query && (
