@@ -57,7 +57,7 @@ export default function AddMovieModal({ onClose }) {
             className="flex-1 bg-transparent text-white text-base outline-none placeholder-cinema-muted"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="text-cinema-muted hover:text-white transition">
+            <button onClick={() => setQuery('')} aria-label="검색어 지우기" className="text-cinema-muted hover:text-white transition">
               <X size={18} />
             </button>
           )}

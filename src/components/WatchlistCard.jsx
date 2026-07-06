@@ -34,6 +34,7 @@ export default function WatchlistCard({ item, onRemove }) {
         onClick={() => onRemove(item.movieId)}
         className="absolute top-2 right-2 bg-blue-500/90 text-white p-1 rounded-full shadow hover:bg-red-500/80 transition-colors"
         title="찜 취소"
+        aria-label="찜 취소"
       >
         <Bookmark size={11} fill="white" />
       </button>

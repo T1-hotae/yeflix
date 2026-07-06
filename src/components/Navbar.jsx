@@ -83,6 +83,7 @@ export default function Navbar() {
             />
             <button
               type="submit"
+              aria-label="검색"
               className="px-4 text-cinema-muted hover:text-cinema-gold transition"
             >
               <Search size={16} />
@@ -96,6 +97,9 @@ export default function Navbar() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
+                aria-label="사용자 메뉴"
+                aria-haspopup="true"
+                aria-expanded={dropdownOpen}
                 className="flex items-center gap-2 hover:opacity-80 transition"
               >
                 <img
@@ -141,7 +145,7 @@ export default function Navbar() {
                     <div className="border-t border-white/20 mt-1 pt-1">
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-cinema-gold hover:bg-cinema-gold/10 transition text-left"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-cinema-goldText hover:bg-cinema-gold/10 transition text-left"
                       >
                         <LogOut size={15} /> 로그아웃
                       </button>

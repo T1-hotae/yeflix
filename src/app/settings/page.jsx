@@ -30,6 +30,7 @@ export default function Settings() {
         <div className="flex items-center gap-3 mb-8">
           <button
             onClick={() => router.back()}
+            aria-label="뒤로가기"
             className="text-cinema-muted hover:text-white transition"
           >
             <ChevronLeft size={22} />
@@ -94,7 +95,7 @@ export default function Settings() {
             await logout();
             router.push("/");
           }}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-cinema-gold/30 text-cinema-gold hover:bg-cinema-gold/10 transition font-semibold text-sm"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-cinema-gold/30 text-cinema-goldText hover:bg-cinema-gold/10 transition font-semibold text-sm"
         >
           <LogOut size={16} /> 로그아웃
         </button>

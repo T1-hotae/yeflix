@@ -129,13 +129,13 @@ function HomeContent() {
                   onClick={() => setTab(t.id)}
                   className={`pb-3 text-xs sm:text-sm font-semibold transition border-b-2 -mb-px whitespace-nowrap shrink-0 ${
                     tab === t.id
-                      ? 'border-cinema-gold text-cinema-gold'
+                      ? 'border-cinema-gold text-cinema-goldText'
                       : 'border-transparent text-cinema-muted hover:text-white'
                   }`}
                 >
                   {t.label}
                   {t.id === 'my_diary' && myDiaries.length > 0 && (
-                    <span className="ml-1.5 text-xs bg-cinema-gold/20 text-cinema-gold px-1.5 py-0.5 rounded-full">
+                    <span className="ml-1.5 text-xs bg-cinema-gold/20 text-cinema-goldText px-1.5 py-0.5 rounded-full">
                       {myDiaries.length}
                     </span>
                   )}

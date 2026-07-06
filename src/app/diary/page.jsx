@@ -104,7 +104,7 @@ export default function MyDiary() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-white font-semibold group-hover:text-cinema-gold transition line-clamp-1">{diary.movieTitle}</h3>
+                    <h3 className="text-white font-semibold group-hover:text-cinema-goldText transition line-clamp-1">{diary.movieTitle}</h3>
                     <StarRating value={diary.rating} readonly size="sm" />
                   </div>
                   <p className="text-cinema-muted text-xs mt-1">{diary.watchedDate} 관람</p>
@@ -114,7 +114,7 @@ export default function MyDiary() {
                   {diary.tags?.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {diary.tags.slice(0, 5).map((tag) => (
-                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-cinema-gold/10 text-cinema-gold/80">#{tag}</span>
+                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-cinema-gold/10 text-cinema-goldText">#{tag}</span>
                       ))}
                       {diary.tags.length > 5 && <span className="text-xs text-cinema-muted">+{diary.tags.length - 5}</span>}
                     </div>

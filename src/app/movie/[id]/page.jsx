@@ -178,6 +178,7 @@ export default function MovieDetail() {
                         : 'bg-white/5 border-white/20 text-cinema-muted hover:bg-blue-500/20 hover:border-blue-400 hover:text-blue-400'
                     } disabled:opacity-50`}
                     title={inWatchlist ? '찜 취소' : '볼영화 찜하기'}
+                    aria-label={inWatchlist ? '찜 취소' : '볼영화 찜하기'}
                   >
                     <Bookmark size={18} fill={inWatchlist ? 'currentColor' : 'none'} />
                   </button>
@@ -298,7 +299,7 @@ export default function MovieDetail() {
               {diary.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {diary.tags.map((tag) => (
-                    <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-cinema-gold/10 text-cinema-gold border border-cinema-gold/20">
+                    <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-cinema-gold/10 text-cinema-goldText border border-cinema-gold/20">
                       #{tag}
                     </span>
                   ))}

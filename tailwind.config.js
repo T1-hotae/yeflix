@@ -10,6 +10,7 @@ module.exports = {
           surface: '#111111',
           accent: '#e94560',
           gold: '#e50914',
+          goldText: '#ff5b64',
           muted: '#9ca3af',
         },
       },

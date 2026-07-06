@@ -20,6 +20,8 @@ export default function StarRating({ value, onChange, readonly = false, size = '
           key={star}
           type="button"
           disabled={readonly}
+          aria-label={`${star}점`}
+          aria-pressed={value >= star}
           className={`${sizeClass} transition-transform ${readonly ? 'cursor-default' : 'hover:scale-110 cursor-pointer'}`}
           onMouseEnter={() => !readonly && setHovered(star)}
           onMouseLeave={() => !readonly && setHovered(0)}

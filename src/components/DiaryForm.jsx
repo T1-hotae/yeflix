@@ -57,7 +57,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
         <label className="block text-sm text-cinema-muted mb-2 font-medium">내 별점</label>
         <StarRating value={rating} onChange={setRating} size="lg" />
         {rating > 0 && (
-          <p className="text-cinema-gold text-sm mt-1">
+          <p className="text-cinema-goldText text-sm mt-1">
             {['', '별로예요', '그저 그래요', '괜찮아요', '좋았어요', '최고예요!'][rating]}
           </p>
         )}
@@ -90,7 +90,7 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
               onClick={() => toggleTag(tag)}
               className={`text-xs px-3 py-1 rounded-full border transition ${
                 tags.includes(tag)
-                  ? 'bg-cinema-gold/20 border-cinema-gold text-cinema-gold'
+                  ? 'bg-cinema-gold/20 border-cinema-gold text-cinema-goldText'
                   : 'bg-white/5 border-white/20 text-cinema-muted hover:border-white/30'
               }`}
             >
