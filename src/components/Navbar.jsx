@@ -115,7 +115,11 @@ export default function Navbar() {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 top-12 w-52 bg-cinema-card border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-50">
+                <div
+                  role="menu"
+                  aria-label="사용자 메뉴"
+                  className="absolute right-0 top-12 w-52 bg-cinema-card border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-50"
+                >
                   {/* 사용자 정보 */}
                   <div className="px-4 py-3 border-b border-white/20">
                     <p className="text-white text-sm font-semibold truncate">
@@ -128,6 +132,7 @@ export default function Navbar() {
 
                   <div className="py-1">
                     <button
+                      role="menuitem"
                       onClick={handleMyDiary}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
                     >
@@ -135,6 +140,7 @@ export default function Navbar() {
                       일기
                     </button>
                     <button
+                      role="menuitem"
                       onClick={handleWatchlist}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
                     >
@@ -142,6 +148,7 @@ export default function Navbar() {
                       볼영화
                     </button>
                     <button
+                      role="menuitem"
                       onClick={handleSettings}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition text-left"
                     >
@@ -149,6 +156,7 @@ export default function Navbar() {
                     </button>
                     <div className="border-t border-white/20 mt-1 pt-1">
                       <button
+                        role="menuitem"
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-cinema-goldText hover:bg-cinema-gold/10 transition text-left"
                       >

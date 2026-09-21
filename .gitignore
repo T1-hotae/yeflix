@@ -29,4 +29,14 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# E2E 테스트
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/e2e/.state/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
 .claude/
