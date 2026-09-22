@@ -1,54 +1,91 @@
 'use client';
 
 import { Suspense, useEffect, useState, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Film, BookOpen, Plus, Bookmark } from 'lucide-react';
-import { getNowPlaying, searchMovies } from '../api/tmdb';
-import { getMyDiaries, getMyMovieIds } from '../firebase/diary';
-import { getWatchlist, removeFromWatchlist, getWatchlistMovieIds } from '../firebase/watchlist';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Film, Tv, BookOpen, Plus, Bookmark } from 'lucide-react';
+import { searchMedia } from '../api/search';
+import { getMyDiaries, getMyMediaKeys } from '../firebase/diary';
+import { getWatchlist, removeFromWatchlist, getWatchlistKeys } from '../firebase/watchlist';
 import { useAuth } from '../context/AuthContext';
-import MovieCard from '../components/MovieCard';
+import {
+  MEDIA_TYPES,
+  MEDIA_LABEL,
+  WATCHLIST_LABEL,
+  mediaKey,
+  typeOf,
+  parseMediaType,
+} from '../lib/media';
+import MediaCard from '../components/MediaCard';
 import DiaryCard from '../components/DiaryCard';
 import WatchlistCard from '../components/WatchlistCard';
-import AddMovieModal from '../components/AddMovieModal';
+import AddMediaModal from '../components/AddMediaModal';
+import MediaGrid, { GridSkeleton } from '../components/MediaGrid';
+import EmptyState from '../components/EmptyState';
+import FilterChips from '../components/FilterChips';
 
 const TABS = [
   { id: 'my_diary', label: '내 일기' },
-  { id: 'watchlist', label: '볼영화' },
-  { id: 'now_playing', label: '현재 상영 중' },
+  { id: 'wl_movie', label: WATCHLIST_LABEL.movie, mediaType: 'movie' },
+  { id: 'wl_tv', label: WATCHLIST_LABEL.tv, mediaType: 'tv' },
+  { id: 'wl_book', label: WATCHLIST_LABEL.book, mediaType: 'book' },
 ];
 
+const TYPE_ICON = { movie: Film, tv: Tv, book: BookOpen };
+
+const SEARCH_FILTERS = MEDIA_TYPES.map((type) => ({ value: type, label: MEDIA_LABEL[type] }));
+
+const DIARY_EMPTY_TITLE = {
+  movie: '영화 일기가 없어요',
+  tv: '드라마 일기가 없어요',
+  book: '책 일기가 없어요',
+};
+
+const WATCHLIST_EMPTY_TITLE = {
+  movie: '찜한 영화가 없어요',
+  tv: '찜한 드라마가 없어요',
+  book: '찜한 책이 없어요',
+};
+
+const WATCHLIST_HINT = {
+  movie: '영화 상세 페이지에서 북마크 버튼을 눌러 찜해보세요!',
+  tv: '드라마 상세 페이지에서 북마크 버튼을 눌러 찜해보세요!',
+  book: '책 상세 페이지에서 북마크 버튼을 눌러 찜해보세요!',
+};
+
 function HomeContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search') ?? '';
+  const searchType = parseMediaType(searchParams.get('type'));
 
   const [tab, setTab] = useState('my_diary');
-  const [movies, setMovies] = useState([]);
+  const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [myMovieIds, setMyMovieIds] = useState(new Set());
+  const [diaryKeys, setDiaryKeys] = useState(new Set());
+  const [watchlistKeys, setWatchlistKeys] = useState(new Set());
   const [myDiaries, setMyDiaries] = useState([]);
   const [diariesLoading, setDiariesLoading] = useState(false);
+  const [diaryFilter, setDiaryFilter] = useState('all');
   const [watchlist, setWatchlist] = useState([]);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
-  const [watchlistMovieIds, setWatchlistMovieIds] = useState(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
 
   const { user, loginWithGoogle } = useAuth();
 
-  // Navbar "내 정보" 클릭 시 탭 전환
+  // Navbar 드롭다운에서 탭 전환
   useEffect(() => {
     const handler = (e) => setTab(e.detail);
     window.addEventListener('switch-tab', handler);
     return () => window.removeEventListener('switch-tab', handler);
   }, []);
 
-  // 내가 일기 쓴 영화 ID 목록
+  // 카드 뱃지용 키 목록
   useEffect(() => {
-    if (!user) { setMyMovieIds(new Set()); setWatchlistMovieIds(new Set()); return; }
-    getMyMovieIds(user.uid).then(setMyMovieIds).catch(console.error);
-    getWatchlistMovieIds(user.uid).then(setWatchlistMovieIds).catch(console.error);
+    if (!user) { setDiaryKeys(new Set()); setWatchlistKeys(new Set()); return; }
+    getMyMediaKeys(user.uid).then(setDiaryKeys).catch(console.error);
+    getWatchlistKeys(user.uid).then(setWatchlistKeys).catch(console.error);
   }, [user]);
 
   // 내 일기 목록
@@ -61,52 +98,75 @@ function HomeContent() {
       .finally(() => setDiariesLoading(false));
   }, [tab, user]);
 
-  // 볼영화 찜 목록
+  // 찜 목록은 타입별로 나누지 않고 한 번만 불러온다 (탭 전환 시 재요청 없음)
   useEffect(() => {
-    if (tab !== 'watchlist' || !user) return;
+    if (!user) { setWatchlist([]); return; }
     setWatchlistLoading(true);
     getWatchlist(user.uid)
       .then(setWatchlist)
       .catch(console.error)
       .finally(() => setWatchlistLoading(false));
-  }, [tab, user]);
+  }, [user]);
 
-  const handleRemoveFromWatchlist = async (movieId) => {
+  const handleRemoveFromWatchlist = async (mediaType, itemId) => {
     if (!user) return;
-    await removeFromWatchlist(user.uid, movieId);
-    setWatchlist((prev) => prev.filter((item) => item.movieId !== movieId));
-    setWatchlistMovieIds((prev) => { const s = new Set(prev); s.delete(movieId); return s; });
+    await removeFromWatchlist(user.uid, mediaType, itemId);
+    setWatchlist((prev) => prev.filter((item) => !(typeOf(item) === mediaType && item.movieId === itemId)));
+    setWatchlistKeys((prev) => {
+      const next = new Set(prev);
+      next.delete(mediaKey(mediaType, itemId));
+      return next;
+    });
   };
 
-  const fetchMovies = useCallback(async (currentPage, reset = false) => {
+  const fetchResults = useCallback(async (currentPage, reset = false) => {
     setLoading(true);
     try {
-      const data = searchQuery
-        ? await searchMovies(searchQuery, currentPage)
-        : await getNowPlaying(currentPage);
-      setMovies((prev) => reset ? data.results : [...prev, ...data.results]);
-      setTotalPages(data.total_pages);
+      const data = await searchMedia(searchType, searchQuery, currentPage);
+      setResults((prev) => (reset ? data.items : [...prev, ...data.items]));
+      setHasMore(data.hasMore);
     } catch (err) {
       console.error(err);
+      if (reset) setResults([]);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, searchType]);
 
   useEffect(() => {
-    if (tab !== 'now_playing' && !searchQuery) return;
+    if (!searchQuery) return;
     setPage(1);
-    setMovies([]);
-    fetchMovies(1, true);
-  }, [tab, searchQuery, fetchMovies]);
+    setResults([]);
+    fetchResults(1, true);
+  }, [searchQuery, searchType, fetchResults]);
 
   const loadMore = () => {
     const next = page + 1;
     setPage(next);
-    fetchMovies(next);
+    fetchResults(next);
   };
 
-  const isMovieTab = searchQuery || tab === 'now_playing';
+  const changeSearchType = (type) => {
+    router.replace(`/?search=${encodeURIComponent(searchQuery)}&type=${type}`);
+  };
+
+  const activeTab = TABS.find((t) => t.id === tab) ?? TABS[0];
+  const watchlistOf = (mediaType) => watchlist.filter((item) => typeOf(item) === mediaType);
+  const countOf = (mediaType) => watchlistOf(mediaType).length;
+
+  const filteredDiaries = diaryFilter === 'all'
+    ? myDiaries
+    : myDiaries.filter((d) => typeOf(d) === diaryFilter);
+
+  const diaryFilters = [
+    { value: 'all', label: '전체', count: myDiaries.length },
+    ...MEDIA_TYPES.map((type) => ({
+      value: type,
+      label: MEDIA_LABEL[type],
+      count: myDiaries.filter((d) => typeOf(d) === type).length,
+    })),
+  ];
 
   return (
     <div className="min-h-screen bg-cinema-bg">
@@ -118,34 +178,43 @@ function HomeContent() {
             <h1 className="text-2xl font-bold text-white">
               "<span className="text-cinema-gold">{searchQuery}</span>" 검색 결과
             </h1>
-            <p className="text-cinema-muted text-sm mt-1">{movies.length}개의 영화</p>
+            <p className="text-cinema-muted text-sm mt-1">
+              {results.length}개의 {MEDIA_LABEL[searchType]}
+            </p>
+            <FilterChips
+              className="mt-4"
+              options={SEARCH_FILTERS}
+              value={searchType}
+              onChange={changeSearchType}
+            />
           </div>
         ) : (
           <div className="flex items-center justify-between mb-6 border-b border-white/20">
-            <div className="flex gap-2 sm:gap-4 min-w-0 flex-1">
-              {TABS.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
-                  className={`pb-3 text-xs sm:text-sm font-semibold transition border-b-2 -mb-px whitespace-nowrap shrink-0 ${
-                    tab === t.id
-                      ? 'border-cinema-gold text-cinema-goldText'
-                      : 'border-transparent text-cinema-muted hover:text-white'
-                  }`}
-                >
-                  {t.label}
-                  {t.id === 'my_diary' && myDiaries.length > 0 && (
-                    <span className="ml-1.5 text-xs bg-cinema-gold/20 text-cinema-goldText px-1.5 py-0.5 rounded-full">
-                      {myDiaries.length}
-                    </span>
-                  )}
-                  {t.id === 'watchlist' && watchlistMovieIds.size > 0 && (
-                    <span className="ml-1.5 text-xs bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded-full">
-                      {watchlistMovieIds.size}
-                    </span>
-                  )}
-                </button>
-              ))}
+            <div className="flex gap-2 sm:gap-4 min-w-0 flex-1 overflow-x-auto scrollbar-hide">
+              {TABS.map((t) => {
+                const count = t.id === 'my_diary' ? myDiaries.length : countOf(t.mediaType);
+                const badgeClass = t.id === 'my_diary'
+                  ? 'bg-cinema-gold/20 text-cinema-goldText'
+                  : 'bg-blue-500/20 text-blue-400';
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTab(t.id)}
+                    className={`pb-3 text-xs sm:text-sm font-semibold transition border-b-2 -mb-px whitespace-nowrap shrink-0 ${
+                      tab === t.id
+                        ? 'border-cinema-gold text-cinema-goldText'
+                        : 'border-transparent text-cinema-muted hover:text-white'
+                    }`}
+                  >
+                    {t.label}
+                    {count > 0 && (
+                      <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${badgeClass}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {tab === 'my_diary' && (
@@ -154,28 +223,28 @@ function HomeContent() {
                 className="flex items-center gap-1.5 bg-cinema-gold text-white text-sm font-bold px-2.5 sm:px-4 py-2 rounded-full hover:opacity-90 transition mb-3 shrink-0 ml-2"
               >
                 <Plus size={15} />
-                <span className="hidden sm:inline">영화 추가하기</span>
+                <span className="hidden sm:inline">기록 추가하기</span>
               </button>
             )}
           </div>
         )}
 
-        {/* 현재 상영 중 / 검색 결과 */}
-        {isMovieTab && (
+        {/* 검색 결과 */}
+        {searchQuery && (
           <>
-            {movies.length > 0 ? (
+            {results.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                  {movies.map((movie) => (
-                    <MovieCard
-                      key={`${movie.id}-${movie.title}`}
-                      movie={movie}
-                      hasDiary={myMovieIds.has(movie.id)}
-                      hasWatchlist={watchlistMovieIds.has(movie.id)}
+                <MediaGrid>
+                  {results.map((item) => (
+                    <MediaCard
+                      key={`${item.mediaType}-${item.id}`}
+                      item={item}
+                      hasDiary={diaryKeys.has(mediaKey(item.mediaType, item.id))}
+                      hasWatchlist={watchlistKeys.has(mediaKey(item.mediaType, item.id))}
                     />
                   ))}
-                </div>
-                {page < totalPages && (
+                </MediaGrid>
+                {hasMore && (
                   <div className="flex justify-center mt-10">
                     <button
                       onClick={loadMore}
@@ -188,52 +257,43 @@ function HomeContent() {
                 )}
               </>
             ) : loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {Array.from({ length: 18 }).map((_, i) => (
-                  <div key={i} className="aspect-[2/3] rounded-xl bg-cinema-card animate-pulse" />
-                ))}
-              </div>
+              <GridSkeleton count={18} />
             ) : (
-              <div className="text-center py-20 text-cinema-muted">
-                {searchQuery ? '검색 결과가 없습니다.' : '영화를 불러오는 중...'}
-              </div>
+              <div className="text-center py-20 text-cinema-muted">검색 결과가 없습니다.</div>
             )}
           </>
         )}
 
-        {/* 볼영화 탭 */}
-        {!searchQuery && tab === 'watchlist' && (
+        {/* 찜 목록 탭 (볼영화 / 볼드라마 / 볼책) */}
+        {!searchQuery && activeTab.mediaType && (
           <>
             {!user ? (
-              <div className="text-center py-20">
-                <Bookmark size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
-                <p className="text-white font-semibold text-lg mb-2">볼영화 찜 목록</p>
-                <p className="text-cinema-muted mb-6">로그인 후 볼영화를 찜할 수 있습니다.</p>
+              <EmptyState
+                icon={Bookmark}
+                title={`${activeTab.label} 찜 목록`}
+                description="로그인 후 찜 목록을 확인할 수 있습니다."
+              >
                 <button
                   onClick={loginWithGoogle}
                   className="bg-white text-gray-900 font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition text-sm"
                 >
                   Google로 로그인
                 </button>
-              </div>
+              </EmptyState>
             ) : watchlistLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="aspect-[2/3] rounded-xl bg-cinema-card animate-pulse" />
-                ))}
-              </div>
-            ) : watchlist.length === 0 ? (
-              <div className="text-center py-20">
-                <Bookmark size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
-                <p className="text-white font-semibold text-lg mb-2">찜한 영화가 없어요</p>
-                <p className="text-cinema-muted">영화 상세 페이지에서 북마크 버튼을 눌러 찜해보세요!</p>
-              </div>
+              <GridSkeleton count={6} />
+            ) : countOf(activeTab.mediaType) === 0 ? (
+              <EmptyState
+                icon={TYPE_ICON[activeTab.mediaType]}
+                title={WATCHLIST_EMPTY_TITLE[activeTab.mediaType]}
+                description={WATCHLIST_HINT[activeTab.mediaType]}
+              />
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {watchlist.map((item) => (
+              <MediaGrid>
+                {watchlistOf(activeTab.mediaType).map((item) => (
                   <WatchlistCard key={item.id} item={item} onRemove={handleRemoveFromWatchlist} />
                 ))}
-              </div>
+              </MediaGrid>
             )}
           </>
         )}
@@ -242,47 +302,62 @@ function HomeContent() {
         {!searchQuery && tab === 'my_diary' && (
           <>
             {!user ? (
-              <div className="text-center py-20">
-                <BookOpen size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
-                <p className="text-white font-semibold text-lg mb-2">내 영화 일기장</p>
-                <p className="text-cinema-muted mb-6">로그인 후 일기를 확인할 수 있습니다.</p>
+              <EmptyState
+                icon={BookOpen}
+                title="내 기록장"
+                description="로그인 후 일기를 확인할 수 있습니다."
+              >
                 <button
                   onClick={loginWithGoogle}
                   className="bg-white text-gray-900 font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition text-sm"
                 >
                   Google로 로그인
                 </button>
-              </div>
+              </EmptyState>
             ) : diariesLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="aspect-[2/3] rounded-xl bg-cinema-card animate-pulse" />
-                ))}
-              </div>
+              <GridSkeleton count={6} />
             ) : myDiaries.length === 0 ? (
-              <div className="text-center py-20">
-                <Film size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
-                <p className="text-white font-semibold text-lg mb-2">아직 일기가 없어요</p>
-                <p className="text-cinema-muted mb-6">본 영화를 추가하고 감상을 기록해보세요!</p>
+              <EmptyState
+                icon={Film}
+                title="아직 일기가 없어요"
+                description="본 영화 · 드라마, 읽은 책을 추가하고 감상을 기록해보세요!"
+              >
                 <button
                   onClick={() => setShowAddModal(true)}
                   className="flex items-center gap-2 bg-cinema-gold text-white font-bold px-6 py-2.5 rounded-full hover:opacity-90 transition text-sm mx-auto"
                 >
-                  <Plus size={15} /> 첫 번째 영화 추가하기
+                  <Plus size={15} /> 첫 번째 기록 추가하기
                 </button>
-              </div>
+              </EmptyState>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {myDiaries.map((diary) => (
-                  <DiaryCard key={diary.id} diary={diary} />
-                ))}
-              </div>
+              <>
+                <FilterChips
+                  className="mb-5"
+                  options={diaryFilters}
+                  value={diaryFilter}
+                  onChange={setDiaryFilter}
+                />
+
+                {filteredDiaries.length === 0 ? (
+                  <EmptyState
+                    icon={TYPE_ICON[diaryFilter] ?? Film}
+                    title={DIARY_EMPTY_TITLE[diaryFilter] ?? '일기가 없어요'}
+                    description={`${MEDIA_LABEL[diaryFilter]} 일기를 기록하면 여기에 모아서 볼 수 있어요.`}
+                  />
+                ) : (
+                  <MediaGrid>
+                    {filteredDiaries.map((diary) => (
+                      <DiaryCard key={diary.id} diary={diary} />
+                    ))}
+                  </MediaGrid>
+                )}
+              </>
             )}
           </>
         )}
       </div>
 
-      {showAddModal && <AddMovieModal onClose={() => setShowAddModal(false)} />}
+      {showAddModal && <AddMediaModal onClose={() => setShowAddModal(false)} />}
     </div>
   );
 }

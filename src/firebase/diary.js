@@ -10,27 +10,28 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './config';
+import { docKey, mediaKey, typeOf, coerceId } from '../lib/media';
 
 const COLLECTION = 'diaries';
 
 // 일기 저장 (신규 or 수정)
-export const saveDiary = async (userId, movieId, data) => {
-  const id = `${userId}_${movieId}`;
+export const saveDiary = async (userId, mediaType, itemId, data) => {
+  const id = docKey(userId, mediaType, itemId);
   const ref = doc(db, COLLECTION, id);
   await setDoc(ref, {
     ...data,
     userId,
-    movieId: Number(movieId),
+    mediaType,
+    movieId: coerceId(mediaType, itemId),
     updatedAt: serverTimestamp(),
     createdAt: data.createdAt ?? serverTimestamp(),
   });
   return id;
 };
 
-// 특정 영화의 내 일기 가져오기
-export const getDiary = async (userId, movieId) => {
-  const id = `${userId}_${movieId}`;
-  const ref = doc(db, COLLECTION, id);
+// 특정 작품의 내 일기 가져오기
+export const getDiary = async (userId, mediaType, itemId) => {
+  const ref = doc(db, COLLECTION, docKey(userId, mediaType, itemId));
   const snap = await getDoc(ref);
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 };
@@ -47,17 +48,19 @@ export const getMyDiaries = async (userId) => {
 };
 
 // 일기 삭제
-export const deleteDiary = async (userId, movieId) => {
-  const id = `${userId}_${movieId}`;
-  await deleteDoc(doc(db, COLLECTION, id));
+export const deleteDiary = async (userId, mediaType, itemId) => {
+  await deleteDoc(doc(db, COLLECTION, docKey(userId, mediaType, itemId)));
 };
 
-// 내가 일기 쓴 movieId 목록
-export const getMyMovieIds = async (userId) => {
+// 내가 일기 쓴 작품 키 목록 ("movie:550" 형태)
+export const getMyMediaKeys = async (userId) => {
   const q = query(
     collection(db, COLLECTION),
     where('userId', '==', userId)
   );
   const snap = await getDocs(q);
-  return new Set(snap.docs.map((d) => d.data().movieId));
+  return new Set(snap.docs.map((d) => {
+    const data = d.data();
+    return mediaKey(typeOf(data), data.movieId);
+  }));
 };

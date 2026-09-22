@@ -69,7 +69,7 @@ function ProviderButton({ provider, movieTitle, fallbackLink }) {
   );
 }
 
-export default function WatchProviders({ providers, movieTitle }) {
+export default function WatchProviders({ providers, title }) {
   if (!providers) {
     return (
       <p className="text-cinema-muted text-sm py-2">
@@ -89,7 +89,7 @@ export default function WatchProviders({ providers, movieTitle }) {
     );
   }
 
-  const title = movieTitle ?? "";
+  const searchTitle = title ?? "";
 
   return (
     <div className="space-y-4">
@@ -103,7 +103,7 @@ export default function WatchProviders({ providers, movieTitle }) {
               <ProviderButton
                 key={p.provider_id}
                 provider={p}
-                movieTitle={title}
+                movieTitle={searchTitle}
                 fallbackLink={link}
               />
             ))}
@@ -121,7 +121,7 @@ export default function WatchProviders({ providers, movieTitle }) {
               <ProviderButton
                 key={p.provider_id}
                 provider={p}
-                movieTitle={title}
+                movieTitle={searchTitle}
                 fallbackLink={link}
               />
             ))}
@@ -139,7 +139,7 @@ export default function WatchProviders({ providers, movieTitle }) {
               <ProviderButton
                 key={p.provider_id}
                 provider={p}
-                movieTitle={title}
+                movieTitle={searchTitle}
                 fallbackLink={link}
               />
             ))}

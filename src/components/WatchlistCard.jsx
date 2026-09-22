@@ -1,13 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { Film, Bookmark } from 'lucide-react';
+import { Film, Tv, BookOpen, Bookmark } from 'lucide-react';
 import { getPosterUrl } from '../api/tmdb';
+import { detailHref, typeOf } from '../lib/media';
+
+const FALLBACK_ICON = { movie: Film, tv: Tv, book: BookOpen };
+const PENDING_LABEL = { movie: '볼 예정', tv: '볼 예정', book: '읽을 예정' };
 
 export default function WatchlistCard({ item, onRemove }) {
+  const mediaType = typeOf(item);
+  const FallbackIcon = FALLBACK_ICON[mediaType] ?? Film;
+
   return (
     <div className="group relative rounded-xl overflow-hidden bg-cinema-card shadow-lg">
-      <Link href={`/movie/${item.movieId}`} className="block">
+      <Link href={detailHref(mediaType, item.movieId)} className="block">
         <div className="aspect-[2/3] overflow-hidden bg-cinema-surface">
           {item.moviePoster ? (
             <img
@@ -18,7 +25,7 @@ export default function WatchlistCard({ item, onRemove }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-cinema-muted">
-              <Film size={40} />
+              <FallbackIcon size={40} />
             </div>
           )}
         </div>
@@ -31,7 +38,7 @@ export default function WatchlistCard({ item, onRemove }) {
       </Link>
 
       <button
-        onClick={() => onRemove(item.movieId)}
+        onClick={() => onRemove(mediaType, item.movieId)}
         className="absolute top-2 right-2 bg-blue-500/90 text-white p-1 rounded-full shadow hover:bg-red-500/80 transition-colors"
         title="찜 취소"
         aria-label="찜 취소"
@@ -41,7 +48,7 @@ export default function WatchlistCard({ item, onRemove }) {
 
       <div className="p-2">
         <p className="text-white text-xs font-medium line-clamp-1">{item.movieTitle}</p>
-        <p className="text-cinema-muted text-xs mt-0.5">볼 예정</p>
+        <p className="text-cinema-muted text-xs mt-0.5">{PENDING_LABEL[mediaType] ?? '볼 예정'}</p>
       </div>
     </div>
   );

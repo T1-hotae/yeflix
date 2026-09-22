@@ -1,16 +1,21 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Film, PenLine } from 'lucide-react';
+import { Film, Tv, BookOpen, PenLine } from 'lucide-react';
 import { getPosterUrl } from '../api/tmdb';
+import { detailHref, typeOf } from '../lib/media';
+
+const FALLBACK_ICON = { movie: Film, tv: Tv, book: BookOpen };
 
 export default function DiaryCard({ diary }) {
   const router = useRouter();
   const poster = diary.moviePoster ? getPosterUrl(diary.moviePoster, 'w342') : null;
+  const mediaType = typeOf(diary);
+  const FallbackIcon = FALLBACK_ICON[mediaType] ?? Film;
 
   return (
     <div
-      onClick={() => router.push(`/movie/${diary.movieId}`)}
+      onClick={() => router.push(detailHref(mediaType, diary.movieId))}
       className="group relative block rounded-xl overflow-hidden bg-cinema-card hover:scale-[1.03] transition-transform duration-200 shadow-lg cursor-pointer"
     >
       <div className="aspect-[2/3] overflow-hidden bg-cinema-surface">
@@ -23,7 +28,7 @@ export default function DiaryCard({ diary }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-cinema-muted">
-            <Film size={40} />
+            <FallbackIcon size={40} />
           </div>
         )}
       </div>

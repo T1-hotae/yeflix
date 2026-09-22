@@ -76,11 +76,20 @@ export default function Settings() {
           <p className="text-xs text-cinema-muted uppercase tracking-wider font-semibold px-6 pt-5 pb-3">
             정보
           </p>
-          <SettingRow icon={<Info size={16} />} label="버전" value="1.0.0" />
           <SettingRow
             icon={<Info size={16} />}
-            label="영화 데이터"
+            label="버전"
+            value={process.env.NEXT_PUBLIC_APP_VERSION}
+          />
+          <SettingRow
+            icon={<Info size={16} />}
+            label="영화 · 드라마 데이터"
             value="TMDB 제공"
+          />
+          <SettingRow
+            icon={<Info size={16} />}
+            label="도서 데이터"
+            value="카카오 책 제공"
           />
           <SettingRow
             icon={<Info size={16} />}

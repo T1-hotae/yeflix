@@ -7,6 +7,7 @@ import { BookOpen, Film, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getMyDiaries } from '../../firebase/diary';
 import { getPosterUrl } from '../../api/tmdb';
+import { detailHref, typeOf, MEDIA_LABEL } from '../../lib/media';
 import StarRating from '../../components/StarRating';
 
 export default function MyDiary() {
@@ -32,7 +33,7 @@ export default function MyDiary() {
       <div className="min-h-screen bg-cinema-bg flex items-center justify-center">
         <div className="text-center">
           <BookOpen size={48} className="text-cinema-muted mx-auto mb-4 opacity-40" />
-          <p className="text-white font-semibold text-lg mb-2">내 영화 일기장</p>
+          <p className="text-white font-semibold text-lg mb-2">내 기록장</p>
           <p className="text-cinema-muted mb-6">로그인 후 일기를 확인할 수 있습니다.</p>
           <button onClick={loginWithGoogle} className="bg-white text-gray-900 font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition text-sm">
             Google로 로그인
@@ -48,9 +49,9 @@ export default function MyDiary() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <BookOpen size={22} /> 내 영화 일기
+              <BookOpen size={22} /> 내 기록
             </h1>
-            <p className="text-cinema-muted text-sm mt-1">총 {diaries.length}편의 영화를 기록했습니다.</p>
+            <p className="text-cinema-muted text-sm mt-1">총 {diaries.length}편을 기록했습니다.</p>
           </div>
           <div className="flex gap-1.5">
             {['all', '5', '4', '3', '2', '1'].map((f) => (
@@ -90,7 +91,7 @@ export default function MyDiary() {
             {filtered.map((diary) => (
               <div
                 key={diary.id}
-                onClick={() => router.push(`/movie/${diary.movieId}`)}
+                onClick={() => router.push(detailHref(typeOf(diary), diary.movieId))}
                 className="flex gap-4 bg-cinema-card rounded-2xl p-4 border border-white/5 hover:border-white/10 cursor-pointer transition group"
               >
                 <div className="w-16 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-cinema-surface">
@@ -105,7 +106,12 @@ export default function MyDiary() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-white font-semibold group-hover:text-cinema-goldText transition line-clamp-1">{diary.movieTitle}</h3>
-                    <StarRating value={diary.rating} readonly size="sm" />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-cinema-muted">
+                        {MEDIA_LABEL[typeOf(diary)]}
+                      </span>
+                      <StarRating value={diary.rating} readonly size="sm" />
+                    </div>
                   </div>
                   <p className="text-cinema-muted text-xs mt-1">{diary.watchedDate} 관람</p>
                   {diary.content && (

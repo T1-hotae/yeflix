@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, BookOpen, Settings, LogOut, Bookmark } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { parseMediaType } from "../lib/media";
 
 export default function Navbar() {
   const { user, loginWithGoogle, logout } = useAuth();
@@ -17,7 +18,10 @@ export default function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (!query.trim()) return;
-    router.push(`/?search=${encodeURIComponent(query.trim())}`);
+    // 이미 검색 중이면 고른 타입(영화/드라마/책)을 유지한다
+    const current = new URLSearchParams(window.location.search).get("type");
+    const type = parseMediaType(current);
+    router.push(`/?search=${encodeURIComponent(query.trim())}&type=${type}`);
     setQuery("");
     searchInputRef.current?.blur();
   };
@@ -47,7 +51,7 @@ export default function Navbar() {
     router.push("/");
     setTimeout(() => {
       window.dispatchEvent(
-        new CustomEvent("switch-tab", { detail: "watchlist" }),
+        new CustomEvent("switch-tab", { detail: "wl_movie" }),
       );
     }, 50);
   };
@@ -87,7 +91,7 @@ export default function Navbar() {
               name="movie-title-search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="영화 제목으로 검색..."
+              placeholder="영화 · 드라마 · 책 검색..."
               inputMode="search"
               enterKeyHint="search"
               autoComplete="off"
