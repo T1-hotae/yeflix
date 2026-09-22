@@ -42,29 +42,45 @@ export default function AddMovieModal({ onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-20 px-4"
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-16 sm:pt-20 px-3 sm:px-4"
       onClick={handleBackdrop}
     >
       <div className="w-full max-w-2xl bg-cinema-card rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
         {/* 검색창 */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/20">
+        <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-3 sm:py-4 border-b border-white/20">
           <Search size={18} className="text-cinema-muted flex-shrink-0" />
           <input
             ref={inputRef}
-            type="text"
+            type="search"
+            name="movie-title-search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="본 영화 제목을 검색하세요..."
             inputMode="search"
             enterKeyHint="search"
-            className="flex-1 bg-transparent text-white text-base outline-none placeholder-cinema-muted"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore=""
+            className="flex-1 min-w-0 bg-transparent text-white text-base outline-none placeholder-cinema-muted"
           />
           {query && (
-            <button onClick={() => setQuery('')} aria-label="검색어 지우기" className="text-cinema-muted hover:text-white transition">
+            <button
+              onClick={() => setQuery('')}
+              aria-label="검색어 지우기"
+              className="flex-shrink-0 p-1 text-cinema-muted hover:text-white transition"
+            >
               <X size={18} />
             </button>
           )}
-          <button onClick={onClose} className="text-cinema-muted hover:text-white transition text-sm ml-1">
+          <button
+            onClick={onClose}
+            aria-label="검색 닫기"
+            className="flex-shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm text-cinema-muted hover:bg-white/10 hover:text-white transition"
+          >
             닫기
           </button>
         </div>
@@ -92,7 +108,7 @@ export default function AddMovieModal({ onClose }) {
             <button
               key={movie.id}
               onClick={() => handleSelect(movie)}
-              className="w-full flex items-center gap-4 px-5 py-3 hover:bg-white/5 transition text-left border-b border-white/15 last:border-0"
+              className="w-full flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 hover:bg-white/5 transition text-left border-b border-white/15 last:border-0"
             >
               <div className="w-10 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-cinema-surface">
                 {movie.poster_path ? (

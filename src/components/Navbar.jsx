@@ -74,22 +74,35 @@ export default function Navbar() {
         </Link>
 
         {/* 검색바 */}
-        <form onSubmit={handleSearch} className="order-3 md:order-2 w-full md:w-auto md:flex-1 md:max-w-lg">
+        <form
+          onSubmit={handleSearch}
+          role="search"
+          autoComplete="off"
+          className="order-3 md:order-2 w-full md:w-auto md:flex-1 md:max-w-lg"
+        >
           <div className="flex bg-white/10 rounded-full overflow-hidden border border-white/20 focus-within:border-cinema-gold/50 transition">
             <input
               ref={searchInputRef}
-              type="text"
+              type="search"
+              name="movie-title-search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="영화 제목으로 검색..."
               inputMode="search"
               enterKeyHint="search"
-              className="flex-1 bg-transparent px-4 py-2 text-sm text-white placeholder-cinema-muted outline-none"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore=""
+              className="flex-1 min-w-0 bg-transparent px-4 py-2 text-sm text-white placeholder-cinema-muted outline-none"
             />
             <button
               type="submit"
               aria-label="검색"
-              className="px-4 text-cinema-muted hover:text-cinema-gold transition"
+              className="shrink-0 px-4 text-cinema-muted hover:text-cinema-gold transition"
             >
               <Search size={16} />
             </button>

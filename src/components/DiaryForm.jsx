@@ -99,33 +99,44 @@ export default function DiaryForm({ initial = null, onSave, onDelete, loading })
           ))}
         </div>
 
-        {tags.filter((t) => !PRESET_TAGS.includes(t)).map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-cinema-accent/20 border border-cinema-accent/40 text-cinema-accent mr-2 mb-2"
-          >
-            #{tag}
-            <button type="button" onClick={() => toggleTag(tag)}>
-              <X size={12} />
-            </button>
-          </span>
-        ))}
+        {tags.some((t) => !PRESET_TAGS.includes(t)) && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {tags.filter((t) => !PRESET_TAGS.includes(t)).map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex max-w-full items-center gap-1 text-xs px-3 py-1 rounded-full bg-cinema-accent/20 border border-cinema-accent/40 text-cinema-accent"
+              >
+                <span className="min-w-0 truncate">#{tag}</span>
+                <button type="button" onClick={() => toggleTag(tag)} aria-label={`${tag} 태그 삭제`} className="shrink-0">
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
 
-        <div className="flex gap-2 mt-1">
+        <div className="flex items-stretch gap-2 mt-1">
           <input
             type="text"
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addCustomTag(e)}
             placeholder="#직접입력"
-            className="flex-1 bg-cinema-surface text-white text-sm px-3 py-2 rounded-lg border border-white/20 focus:border-cinema-gold/50 outline-none transition placeholder-cinema-muted"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore=""
+            className="flex-1 min-w-0 w-full bg-cinema-surface text-white text-sm px-3 py-2 rounded-lg border border-white/20 focus:border-cinema-gold/50 outline-none transition placeholder-cinema-muted"
           />
           <button
             type="button"
             onClick={addCustomTag}
-            className="flex items-center gap-1 text-sm px-3 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
+            className="shrink-0 flex items-center justify-center gap-1 whitespace-nowrap text-sm px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20 hover:bg-white/20 transition"
           >
-            <Plus size={14} /> 추가
+            <Plus size={14} className="shrink-0" />
+            추가
           </button>
         </div>
       </div>

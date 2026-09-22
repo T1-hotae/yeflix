@@ -11,6 +11,20 @@
   }
 }
 
+@layer base {
+  /* type="search" 로 바꾼 입력창의 브라우저 기본 X 버튼 제거 (커스텀 버튼과 중복) */
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-decoration,
+  input[type='search']::-webkit-search-results-button,
+  input[type='search']::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type='search']::-ms-clear {
+    display: none;
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
