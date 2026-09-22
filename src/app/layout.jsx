@@ -1,11 +1,69 @@
 import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import {
+  SITE_NAME,
+  SITE_URL,
+  SITE_TAGLINE,
+  SITE_DESCRIPTION,
+  OG_IMAGE,
+} from '../lib/site';
 
 export const metadata = {
-  title: 'Yeflix',
-  description: '나만의 영화 일기장',
-  applicationName: 'Yeflix',
+  // 상대 경로 OG 이미지·canonical 을 절대 URL 로 바꿔주는 기준점
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    'Yeflix',
+    '영화 일기',
+    '드라마 기록',
+    '독서 기록',
+    '감상 기록',
+    '별점 기록',
+    '왓챠 대신',
+    'OTT 어디서 볼까',
+    '볼 영화 목록',
+  ],
+  authors: [{ name: 'HwangHotae', url: 'https://github.com/T1-hotae' }],
+  creator: 'HwangHotae',
+  category: 'entertainment',
+  manifest: '/manifest.webmanifest',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: 'ko_KR',
+    url: '/',
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE.url],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  // 모바일 사파리가 숫자를 전화번호로 오인해 링크 거는 것 방지 (별점·연도·ISBN)
+  formatDetection: { telephone: false, email: false, address: false },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -18,13 +76,14 @@ export const metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'Yeflix',
+    title: SITE_NAME,
     statusBarStyle: 'black-translucent',
   },
 };
 
 export const viewport = {
   themeColor: '#0d0d0d',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({ children }) {
