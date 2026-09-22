@@ -27,6 +27,7 @@ const appEnv = {
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '000000000000',
   NEXT_PUBLIC_FIREBASE_APP_ID: '1:000000000000:web:e2e',
   NEXT_PUBLIC_TMDB_API_KEY: 'e2e-mocked-key',
+  KAKAO_REST_API_KEY: 'e2e-mocked-key',
 };
 
 module.exports = defineConfig({

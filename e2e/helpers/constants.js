@@ -37,6 +37,23 @@ const WATCHLIST_MOVIE = {
   posterPath: '/inception-poster.jpg',
 };
 
+// 찜(볼드라마) 목록에 들어 있는 드라마
+const WATCHLIST_TV = {
+  id: 135157,
+  title: '이상한 변호사 우영우',
+  originalName: 'Extraordinary Attorney Woo',
+  posterPath: '/woo-poster.jpg',
+};
+
+// 찜(볼책) 목록에 들어 있는 책
+const WATCHLIST_BOOK = {
+  isbn: '9788937460449',
+  title: '데미안',
+  authors: ['헤르만 헤세'],
+  publisher: '민음사',
+  thumbnail: 'https://search1.kakaocdn.net/thumb/demian.jpg',
+};
+
 // 미리 작성돼 있어야 하는 일기 내용
 const SEEDED_DIARY = {
   rating: 5,
@@ -57,5 +74,7 @@ module.exports = {
   TEST_USER,
   DIARY_MOVIE,
   WATCHLIST_MOVIE,
+  WATCHLIST_TV,
+  WATCHLIST_BOOK,
   SEEDED_DIARY,
 };
