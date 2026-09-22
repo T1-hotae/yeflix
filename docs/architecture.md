@@ -36,6 +36,7 @@ src/
 │   ├── book/[isbn]/        책 상세
 │   ├── diary/              일기 목록 페이지 (Navbar에서 링크되지 않음)
 │   ├── settings/           설정
+│   │                       ↑ 모든 라우트의 layout.jsx = 메타데이터 전용 서버 컴포넌트
 │   ├── manifest.js         PWA 매니페스트
 │   ├── sitemap.js / robots.js
 │   └── globals.css         유일한 CSS 파일
@@ -100,6 +101,11 @@ app/movie/[id]/page.jsx     클라이언트 — 실제 화면
 
 두 곳이 같은 데이터를 각각 가져온다(서버는 크롤러 응답용, 클라이언트는 화면용).
 중복 호출처럼 보이지만 의도된 것이고, 서버 쪽은 `revalidate: 86400`으로 캐시된다.
+
+`diary/`와 `settings/`에도 `layout.jsx`가 있지만 이쪽은 외부 데이터 없이 고정 메타데이터만 준다
+(본인만 보는 페이지라 `robots: { index: false }`).
+
+**따라서 `layout.jsx`는 메타데이터 전용이다.** UI를 감싸는 용도로 쓰지 않는다.
 
 ## 데이터 흐름
 

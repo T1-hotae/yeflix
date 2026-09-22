@@ -117,3 +117,14 @@ npm run test:e2e   # Firebase 에뮬레이터 + next dev 를 자동으로 띄우
 ```
 
 외부 네트워크(TMDB · 카카오 책 · OTT · 서점)는 모두 목킹되므로 API 키 없이도 돌아갑니다.
+
+---
+
+## 개발 문서
+
+| 문서 | 내용 |
+|------|------|
+| [docs/architecture.md](docs/architecture.md) | 폴더 구조, 렌더링 전략, 공용 컴포넌트, 미디어 타입 추상화 |
+| [docs/api.md](docs/api.md) | TMDB · 카카오 책 API, 서버 프록시, 보러가기 링크 |
+| [docs/data-model.md](docs/data-model.md) | Firestore 스키마, 문서 ID 규칙, 쿼리 전략 |
+| [e2e/README.md](e2e/README.md) | E2E 테스트 시나리오와 목킹 구조 |
