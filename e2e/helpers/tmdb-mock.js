@@ -187,6 +187,33 @@ function resolveBooks(searchParams) {
   return { documents, meta: { is_end: true, total_count: documents.length, pageable_count: documents.length } };
 }
 
+// 앱이 "보러가기"로 내보내는 외부 호스트 전체 목록.
+// 여기 빠진 호스트는 테스트가 실제 사이트로 네트워크 요청을 보낸다.
+//
+// tests/component/external-links.test.jsx 가 이 목록을 실제 컴포넌트가 만드는
+// 링크와 대조하므로, 서점·OTT를 추가하고 여기 안 넣으면 `npm test`가 알려준다.
+const EXTERNAL_HOSTS = [
+  // OTT
+  'www.netflix.com',
+  'watcha.com',
+  'www.wavve.com',
+  'www.tving.com',
+  'www.coupangplay.com',
+  'www.disneyplus.com',
+  'tv.apple.com',
+  'www.primevideo.com',
+  'www.seezn.com',
+  'www.themoviedb.org',
+  // 서점 / 도서관 / 전자책
+  'search.kyobobook.co.kr',
+  'www.yes24.com',
+  'www.aladin.co.kr',
+  'www.nl.go.kr',
+  'www.millie.co.kr',
+  'ridibooks.com',
+  'search.daum.net',
+];
+
 /**
  * 컨텍스트 단위로 외부 요청을 가로챕니다.
  * 컨텍스트에 걸기 때문에 "보러가기"로 열리는 팝업(새 탭)에도 그대로 적용됩니다.
@@ -234,28 +261,6 @@ async function mockExternalRequests(context) {
   );
 
   // "보러가기"로 이동하는 OTT / 서점 사이트 — 실제로 방문하지 않고 스텁 페이지를 돌려줍니다.
-  const EXTERNAL_HOSTS = [
-    // OTT
-    'www.netflix.com',
-    'watcha.com',
-    'www.wavve.com',
-    'www.tving.com',
-    'www.coupangplay.com',
-    'www.disneyplus.com',
-    'tv.apple.com',
-    'www.primevideo.com',
-    'www.seezn.com',
-    'www.themoviedb.org',
-    // 서점 / 도서관 / 전자책
-    'search.kyobobook.co.kr',
-    'www.yes24.com',
-    'www.aladin.co.kr',
-    'www.nl.go.kr',
-    'www.millie.co.kr',
-    'ridibooks.com',
-    'search.daum.net',
-  ];
-
   for (const host of EXTERNAL_HOSTS) {
     await context.route(`**://${host}/**`, async (route) => {
       const url = route.request().url();
@@ -270,6 +275,7 @@ async function mockExternalRequests(context) {
 
 module.exports = {
   mockExternalRequests,
+  EXTERNAL_HOSTS,
   MOVIE_DETAILS,
   TV_DETAILS,
   BOOK_DOCUMENTS,
