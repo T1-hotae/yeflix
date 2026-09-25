@@ -13,14 +13,16 @@ Firestore 최상위 컬렉션 두 개를 쓴다. 사용자별 하위 컬렉션�
 (TMDB 영화 1399와 드라마 1399는 다른 작품이다). 그래서 타입을 ID에 넣는다.
 
 ```
-movie : {uid}_{id}                  예) abc123_550
-tv    : {uid}_tv_{id}               예) abc123_tv_1399
-book  : {uid}_book_{isbn13}         예) abc123_book_9788937460449
+{uid}_{mediaType}_{itemId}
+
+movie : abc123_movie_550
+tv    : abc123_tv_1399
+book  : abc123_book_9788937460449
 ```
 
-**영화만 접두어가 없다.** 드라마·책을 추가하기 전에 저장된 기존 문서를 그대로 쓰기 위한 것이고,
-덕분에 마이그레이션이 필요 없었다. 이 규칙은 [`lib/media.js`](../src/lib/media.js)의
-`docKey()` 한 곳에만 있으므로 직접 문자열을 조립하지 말 것.
+**타입에 예외가 없다.** 문서 ID만 봐도 어떤 타입인지 알 수 있다.
+이 규칙은 [`lib/media.js`](../src/lib/media.js)의 `docKey()` 한 곳에만 있으므로
+직접 문자열을 조립하지 말 것.
 
 ## 문서 형태
 
@@ -29,10 +31,10 @@ book  : {uid}_book_{isbn13}         예) abc123_book_9788937460449
 ```js
 {
   userId:      string,           // Firebase uid
-  mediaType:   'movie' | 'tv' | 'book',
-  movieId:     number | string,  // 책만 문자열 ISBN13
-  movieTitle:  string,
-  moviePoster: string | null,    // TMDB 경로('/abc.jpg') 또는 책 표지 절대 URL
+  mediaType:   'movie' | 'tv' | 'book',   // 항상 존재
+  itemId:      number | string,  // 책만 문자열 ISBN13
+  title:       string,
+  poster:      string | null,    // TMDB 경로('/abc.jpg') 또는 책 표지 절대 URL
   rating:      number,           // 1~5 정수, 필수
   content:     string,
   tags:        string[],         // 최대 10개
@@ -48,35 +50,23 @@ book  : {uid}_book_{isbn13}         예) abc123_book_9788937460449
 {
   userId:      string,
   mediaType:   'movie' | 'tv' | 'book',
-  movieId:     number | string,
-  movieTitle:  string,
-  moviePoster: string | null,
+  itemId:      number | string,
+  title:       string,
+  poster:      string | null,
   addedAt:     Timestamp,
 }
 ```
 
-## 필드명이 `movieId`인 이유
+`title` · `poster` · `mediaType`은 API 정규화 shape(`{ mediaType, id, title, poster }`)와
+이름이 같다. 저장할 때 이름을 갈아끼우지 않고 그대로 넘긴다.
 
-영화 전용 앱으로 시작해서 필드명이 `movie*`로 굳었다. 드라마·책을 추가할 때
-**필드명을 바꾸지 않고 `mediaType`만 더했다** — 기존 문서를 건드리지 않기 위해서다.
+`mediaType`은 모든 문서에 있으므로 `doc.mediaType`을 그대로 읽으면 된다.
 
-그래서 `movieId`는 실제로는 "작품 ID"이고, `movieTitle` · `moviePoster`도 마찬가지다.
-읽을 때 헷갈리지 않게 주의한다.
-
-## 레거시 문서 호환 (중요)
-
-`mediaType`이 **없는 문서가 존재한다.** 드라마·책 추가 이전에 저장된 것들이다.
-이런 문서는 영화로 취급해야 한다. 직접 `doc.mediaType`을 읽지 말고 항상 이 헬퍼를 쓴다.
-
-```js
-import { typeOf } from '../lib/media';
-
-typeOf(doc)   // doc.mediaType ?? 'movie'
-```
-
-E2E 시드는 일부러 영화 문서에 `mediaType`을 넣지 않는다
-([`e2e/helpers/emulator.js`](../e2e/helpers/emulator.js)의 `seedWatchlistItem`).
-이 하위 호환이 깨지면 테스트가 잡아낸다.
+> **이력.** 영화 전용 앱으로 시작한 탓에 한동안 필드명이 `movieId` · `movieTitle` ·
+> `moviePoster`였고, 영화 문서에는 `mediaType`이 없었으며 문서 ID도
+> `{uid}_{id}`로 영화만 접두어가 빠져 있었다. 2026-09-24에 전부 위 구조로 옮겼다.
+> 그 이후로 레거시 문서는 존재하지 않는다.
+> 대조표와 이전 절차는 [migration-media-schema.md](migration-media-schema.md)에 있다.
 
 ## 접근 함수
 
@@ -91,6 +81,9 @@ Firestore를 컴포넌트에서 직접 부르지 않는다. 항상 아래 두 �
 | `getMyDiaries(uid)` | 전체 반환, 최신순 |
 | `deleteDiary(uid, mediaType, itemId)` | |
 | `getMyMediaKeys(uid)` | `Set<"movie:550">` — 카드 뱃지용 |
+
+> 저장 시 `itemId`는 `coerceId()`를 거친다. URL 파라미터는 항상 문자열이라
+> 그대로 두면 `item.itemId === itemId` 같은 엄격 비교가 조용히 빗나간다.
 
 ### [`src/firebase/watchlist.js`](../src/firebase/watchlist.js)
 
@@ -108,7 +101,7 @@ Firestore를 컴포넌트에서 직접 부르지 않는다. 항상 아래 두 �
 Firestore 복합 인덱스를 만들지 않기 위한 의도적인 선택이다.
 
 타입별 필터(볼드라마 탭, 일기 종류 필터)도 같은 이유로 클라이언트에서 건다.
-`getWatchlist(uid)`로 전부 받아 `typeOf(item) === 'tv'`로 거르는 식이다.
+`getWatchlist(uid)`로 전부 받아 `item.mediaType === 'tv'`로 거르는 식이다.
 탭마다 다시 쿼리하지 않는다.
 
 > `where('mediaType', '==', ...)`나 `orderBy`를 추가하면 복합 인덱스가 필요해진다.
@@ -133,3 +126,4 @@ Firestore 복합 인덱스를 만들지 않기 위한 의도적인 선택이다.
 
 - [architecture.md](architecture.md) — 전체 구조
 - [api.md](api.md) — 외부 API
+- [migration-media-schema.md](migration-media-schema.md) — 2026-09-24 스키마 정리 (이전/이후 대조)
