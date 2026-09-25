@@ -2,12 +2,12 @@
 // 테스트를 결정적으로 만듭니다.
 // (실제 네트워크를 타지 않으므로 API 키·쿼터·응답 변동에 영향받지 않습니다)
 
-const {
+import {
   DIARY_MOVIE,
   WATCHLIST_MOVIE,
   WATCHLIST_TV,
   WATCHLIST_BOOK,
-} = require('./constants');
+} from './constants.mjs';
 
 // 1x1 투명 PNG
 const PIXEL_PNG = Buffer.from(
@@ -15,21 +15,21 @@ const PIXEL_PNG = Buffer.from(
   'base64',
 );
 
-const NETFLIX = {
+export const NETFLIX = {
   logo_path: '/netflix.jpg',
   provider_id: 8,
   provider_name: 'Netflix',
   display_priority: 1,
 };
 
-const WATCHA = {
+export const WATCHA = {
   logo_path: '/watcha.jpg',
   provider_id: 97,
   provider_name: 'Watcha',
   display_priority: 2,
 };
 
-const MOVIE_DETAILS = {
+export const MOVIE_DETAILS = {
   [DIARY_MOVIE.id]: {
     id: DIARY_MOVIE.id,
     title: DIARY_MOVIE.title,
@@ -58,7 +58,7 @@ const MOVIE_DETAILS = {
   },
 };
 
-const TV_DETAILS = {
+export const TV_DETAILS = {
   [WATCHLIST_TV.id]: {
     id: WATCHLIST_TV.id,
     name: WATCHLIST_TV.title,
@@ -95,7 +95,7 @@ const TV_CREDITS = {
 };
 
 // 카카오 책 검색 API 응답 형식 (documents / meta)
-const BOOK_DOCUMENTS = [
+export const BOOK_DOCUMENTS = [
   {
     title: WATCHLIST_BOOK.title,
     contents: '소년 싱클레어가 데미안을 만나 자기 자신에게 이르는 길을 찾아가는 성장소설.',
@@ -192,7 +192,7 @@ function resolveBooks(searchParams) {
 //
 // tests/component/external-links.test.jsx 가 이 목록을 실제 컴포넌트가 만드는
 // 링크와 대조하므로, 서점·OTT를 추가하고 여기 안 넣으면 `npm test`가 알려준다.
-const EXTERNAL_HOSTS = [
+export const EXTERNAL_HOSTS = [
   // OTT
   'www.netflix.com',
   'watcha.com',
@@ -218,7 +218,7 @@ const EXTERNAL_HOSTS = [
  * 컨텍스트 단위로 외부 요청을 가로챕니다.
  * 컨텍스트에 걸기 때문에 "보러가기"로 열리는 팝업(새 탭)에도 그대로 적용됩니다.
  */
-async function mockExternalRequests(context) {
+export async function mockExternalRequests(context) {
   // TMDB REST API
   await context.route('**://api.themoviedb.org/**', async (route) => {
     const url = new URL(route.request().url());
@@ -272,13 +272,3 @@ async function mockExternalRequests(context) {
     });
   }
 }
-
-module.exports = {
-  mockExternalRequests,
-  EXTERNAL_HOSTS,
-  MOVIE_DETAILS,
-  TV_DETAILS,
-  BOOK_DOCUMENTS,
-  NETFLIX,
-  WATCHA,
-};

@@ -5,24 +5,24 @@
 //  - 찜해 둔 드라마 1건 (이상한 변호사 우영우)
 //  - 찜해 둔 책 1권 (데미안)
 
-const {
+import {
   resetEmulators,
   createGoogleUser,
   seedDiary,
   seedWatchlistItem,
   seedWatchlistMedia,
-} = require('./helpers/emulator');
-const { writeSeed } = require('./helpers/seed-state');
-const {
+} from './helpers/emulator.mjs';
+import { writeSeed } from './helpers/seed-state.mjs';
+import {
   TEST_USER,
   DIARY_MOVIE,
   WATCHLIST_MOVIE,
   WATCHLIST_TV,
   WATCHLIST_BOOK,
   SEEDED_DIARY,
-} = require('./helpers/constants');
+} from './helpers/constants.mjs';
 
-module.exports = async function globalSetup() {
+export default async function globalSetup() {
   await resetEmulators();
 
   const uid = await createGoogleUser(TEST_USER);
@@ -35,4 +35,4 @@ module.exports = async function globalSetup() {
   writeSeed({ uid, email: TEST_USER.email });
 
   console.log(`[e2e] 시드 완료 — uid=${uid}, 일기 1건, 찜 3건(영화/드라마/책)`);
-};
+}

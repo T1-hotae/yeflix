@@ -1,13 +1,9 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { createRequire } from 'node:module';
 import BookLinks from '../../src/components/BookLinks';
 import WatchProviders from '../../src/components/WatchProviders';
-
-// e2e 헬퍼는 CommonJS 라 require 로 읽는다
-const require_ = createRequire(import.meta.url);
-const { EXTERNAL_HOSTS } = require_('../../e2e/helpers/tmdb-mock.js');
+import { EXTERNAL_HOSTS } from '../../e2e/helpers/tmdb-mock.mjs';
 
 const ISBN = '9788937460449';
 const BOOK_TITLE = '데미안';
@@ -161,7 +157,7 @@ describe('WatchProviders', () => {
 
 /* ----------------------- E2E 목킹 호스트와 대조 (규칙 #6) ---------------------- */
 
-// 외부 링크를 추가하고 e2e/helpers/tmdb-mock.js 의 EXTERNAL_HOSTS 에 넣지 않으면
+// 외부 링크를 추가하고 e2e/helpers/tmdb-mock.mjs 의 EXTERNAL_HOSTS 에 넣지 않으면
 // E2E 가 실제 사이트로 네트워크 요청을 보낸다. 그 누락을 여기서 먼저 잡는다.
 describe('E2E 목킹 누락 감시', () => {
   const renderedHosts = () => {
@@ -180,7 +176,7 @@ describe('E2E 목킹 누락 감시', () => {
 
     expect(
       missing,
-      `e2e/helpers/tmdb-mock.js 의 EXTERNAL_HOSTS 에 다음 호스트를 추가하세요: ${missing.join(', ')}`
+      `e2e/helpers/tmdb-mock.mjs 의 EXTERNAL_HOSTS 에 다음 호스트를 추가하세요: ${missing.join(', ')}`
     ).toEqual([]);
   });
 

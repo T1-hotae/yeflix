@@ -1,11 +1,11 @@
 // Firebase 에뮬레이터를 REST API로 제어하는 헬퍼.
 // (Auth / Firestore 에뮬레이터는 인증 없이 조작할 수 있는 관리용 엔드포인트를 제공합니다)
 
-const {
+import {
   AUTH_EMULATOR_URL,
   FIRESTORE_EMULATOR_URL,
   FIREBASE_PROJECT_ID,
-} = require('./constants');
+} from './constants.mjs';
 
 const DOCS_BASE = `${FIRESTORE_EMULATOR_URL}/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
@@ -28,7 +28,7 @@ async function request(url, init = {}) {
 }
 
 /** Auth / Firestore 에뮬레이터의 모든 데이터를 비웁니다. */
-async function resetEmulators() {
+export async function resetEmulators() {
   await request(
     `${AUTH_EMULATOR_URL}/emulator/v1/projects/${FIREBASE_PROJECT_ID}/accounts`,
     { method: 'DELETE' },
@@ -46,7 +46,7 @@ async function resetEmulators() {
  *
  * @returns {Promise<string>} 생성된 계정의 uid(localId)
  */
-async function createGoogleUser(user) {
+export async function createGoogleUser(user) {
   const idToken = JSON.stringify({
     sub: user.sub,
     email: user.email,
@@ -98,7 +98,7 @@ function toFirestoreFields(obj) {
 }
 
 /** 지정한 문서 ID로 Firestore 문서를 씁니다. */
-async function setDocument(collection, docId, data) {
+export async function setDocument(collection, docId, data) {
   await request(`${DOCS_BASE}/${collection}/${encodeURIComponent(docId)}`, {
     method: 'PATCH',
     body: JSON.stringify({ fields: toFirestoreFields(data) }),
@@ -106,7 +106,7 @@ async function setDocument(collection, docId, data) {
 }
 
 /** 앱의 saveDiary()와 동일한 문서 구조로 일기를 심습니다. */
-async function seedDiary(uid, movie, diary) {
+export async function seedDiary(uid, movie, diary) {
   await setDocument('diaries', `${uid}_movie_${movie.id}`, {
     userId: uid,
     mediaType: 'movie',
@@ -123,12 +123,12 @@ async function seedDiary(uid, movie, diary) {
 }
 
 /** 앱의 addToWatchlist()와 동일한 문서 구조로 영화 찜을 심습니다. */
-async function seedWatchlistItem(uid, movie) {
+export async function seedWatchlistItem(uid, movie) {
   await seedWatchlistMedia(uid, 'movie', movie);
 }
 
 /** 찜 문서 하나. 문서 ID는 타입에 예외 없이 {uid}_{mediaType}_{itemId} 입니다. */
-async function seedWatchlistMedia(uid, mediaType, item) {
+export async function seedWatchlistMedia(uid, mediaType, item) {
   const itemId = mediaType === 'book' ? item.isbn : item.id;
   await setDocument('watchlist', `${uid}_${mediaType}_${itemId}`, {
     userId: uid,
@@ -139,12 +139,3 @@ async function seedWatchlistMedia(uid, mediaType, item) {
     addedAt: new Date('2026-09-11T12:00:00Z'),
   });
 }
-
-module.exports = {
-  resetEmulators,
-  createGoogleUser,
-  setDocument,
-  seedDiary,
-  seedWatchlistItem,
-  seedWatchlistMedia,
-};
