@@ -31,8 +31,8 @@ export default function MediaDiarySection({ mediaType, itemId, item, onSaved }) 
     try {
       await saveDiary(user.uid, mediaType, itemId, {
         ...data,
-        movieTitle: item.title,
-        moviePoster: item.poster ?? null,
+        title: item.title,
+        poster: item.poster ?? null,
         createdAt: diary?.createdAt ?? null,
       });
       setDiary(await getDiary(user.uid, mediaType, itemId));

@@ -10,9 +10,9 @@ import { useAuth } from '../context/AuthContext';
 import {
   MEDIA_TYPES,
   MEDIA_LABEL,
+  MEDIA_FILTERS,
   WATCHLIST_LABEL,
   mediaKey,
-  typeOf,
   parseMediaType,
 } from '../lib/media';
 import MediaCard from '../components/MediaCard';
@@ -31,8 +31,6 @@ const TABS = [
 ];
 
 const TYPE_ICON = { movie: Film, tv: Tv, book: BookOpen };
-
-const SEARCH_FILTERS = MEDIA_TYPES.map((type) => ({ value: type, label: MEDIA_LABEL[type] }));
 
 const DIARY_EMPTY_TITLE = {
   movie: '영화 일기가 없어요',
@@ -111,7 +109,7 @@ function HomeContent() {
   const handleRemoveFromWatchlist = async (mediaType, itemId) => {
     if (!user) return;
     await removeFromWatchlist(user.uid, mediaType, itemId);
-    setWatchlist((prev) => prev.filter((item) => !(typeOf(item) === mediaType && item.movieId === itemId)));
+    setWatchlist((prev) => prev.filter((item) => !(item.mediaType === mediaType && item.itemId === itemId)));
     setWatchlistKeys((prev) => {
       const next = new Set(prev);
       next.delete(mediaKey(mediaType, itemId));
@@ -152,19 +150,19 @@ function HomeContent() {
   };
 
   const activeTab = TABS.find((t) => t.id === tab) ?? TABS[0];
-  const watchlistOf = (mediaType) => watchlist.filter((item) => typeOf(item) === mediaType);
+  const watchlistOf = (mediaType) => watchlist.filter((item) => item.mediaType === mediaType);
   const countOf = (mediaType) => watchlistOf(mediaType).length;
 
   const filteredDiaries = diaryFilter === 'all'
     ? myDiaries
-    : myDiaries.filter((d) => typeOf(d) === diaryFilter);
+    : myDiaries.filter((d) => d.mediaType === diaryFilter);
 
   const diaryFilters = [
     { value: 'all', label: '전체', count: myDiaries.length },
     ...MEDIA_TYPES.map((type) => ({
       value: type,
       label: MEDIA_LABEL[type],
-      count: myDiaries.filter((d) => typeOf(d) === type).length,
+      count: myDiaries.filter((d) => d.mediaType === type).length,
     })),
   ];
 
@@ -183,7 +181,7 @@ function HomeContent() {
             </p>
             <FilterChips
               className="mt-4"
-              options={SEARCH_FILTERS}
+              options={MEDIA_FILTERS}
               value={searchType}
               onChange={changeSearchType}
             />

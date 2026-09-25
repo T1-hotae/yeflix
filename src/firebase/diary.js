@@ -10,7 +10,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './config';
-import { docKey, mediaKey, typeOf, coerceId } from '../lib/media';
+import { docKey, mediaKey, coerceId } from '../lib/media';
 
 const COLLECTION = 'diaries';
 
@@ -22,7 +22,7 @@ export const saveDiary = async (userId, mediaType, itemId, data) => {
     ...data,
     userId,
     mediaType,
-    movieId: coerceId(mediaType, itemId),
+    itemId: coerceId(mediaType, itemId),
     updatedAt: serverTimestamp(),
     createdAt: data.createdAt ?? serverTimestamp(),
   });
@@ -61,6 +61,6 @@ export const getMyMediaKeys = async (userId) => {
   const snap = await getDocs(q);
   return new Set(snap.docs.map((d) => {
     const data = d.data();
-    return mediaKey(typeOf(data), data.movieId);
+    return mediaKey(data.mediaType, data.itemId);
   }));
 };

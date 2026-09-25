@@ -3,26 +3,26 @@
 import { useRouter } from 'next/navigation';
 import { Film, Tv, BookOpen, PenLine } from 'lucide-react';
 import { getPosterUrl } from '../api/tmdb';
-import { detailHref, typeOf } from '../lib/media';
+import { detailHref } from '../lib/media';
 
 const FALLBACK_ICON = { movie: Film, tv: Tv, book: BookOpen };
 
 export default function DiaryCard({ diary }) {
   const router = useRouter();
-  const poster = diary.moviePoster ? getPosterUrl(diary.moviePoster, 'w342') : null;
-  const mediaType = typeOf(diary);
+  const poster = diary.poster ? getPosterUrl(diary.poster, 'w342') : null;
+  const mediaType = diary.mediaType;
   const FallbackIcon = FALLBACK_ICON[mediaType] ?? Film;
 
   return (
     <div
-      onClick={() => router.push(detailHref(mediaType, diary.movieId))}
+      onClick={() => router.push(detailHref(mediaType, diary.itemId))}
       className="group relative block rounded-xl overflow-hidden bg-cinema-card hover:scale-[1.03] transition-transform duration-200 shadow-lg cursor-pointer"
     >
       <div className="aspect-[2/3] overflow-hidden bg-cinema-surface">
         {poster ? (
           <img
             src={poster}
-            alt={diary.movieTitle}
+            alt={diary.title}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -47,7 +47,7 @@ export default function DiaryCard({ diary }) {
       {/* hover 오버레이 */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-3">
         <div>
-          <p className="text-white font-semibold text-sm leading-tight line-clamp-2">{diary.movieTitle}</p>
+          <p className="text-white font-semibold text-sm leading-tight line-clamp-2">{diary.title}</p>
           {diary.content && (
             <p className="text-gray-300 text-xs mt-1 line-clamp-2 leading-relaxed">{diary.content}</p>
           )}
@@ -55,7 +55,7 @@ export default function DiaryCard({ diary }) {
       </div>
 
       <div className="p-2">
-        <p className="text-white text-xs font-medium line-clamp-1">{diary.movieTitle}</p>
+        <p className="text-white text-xs font-medium line-clamp-1">{diary.title}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
           <span className="text-yellow-400 text-xs">
             {'★'.repeat(diary.rating)}

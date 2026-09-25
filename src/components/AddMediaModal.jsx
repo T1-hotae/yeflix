@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Search, X, Film, Tv, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 import { getPosterUrl, formatRating } from '../api/tmdb';
 import { searchMedia } from '../api/search';
-import { MEDIA_TYPES, MEDIA_LABEL, detailHref } from '../lib/media';
+import { MEDIA_LABEL, MEDIA_FILTERS, detailHref } from '../lib/media';
 import FilterChips from './FilterChips';
 
-const TYPE_FILTERS = MEDIA_TYPES.map((type) => ({ value: type, label: MEDIA_LABEL[type] }));
 const FALLBACK_ICON = { movie: Film, tv: Tv, book: BookOpen };
 const PLACEHOLDER = {
   movie: '본 영화 제목을 검색하세요...',
@@ -102,7 +101,7 @@ export default function AddMediaModal({ onClose }) {
 
         {/* 타입 필터 */}
         <div className="px-3 sm:px-5 py-3 border-b border-white/15">
-          <FilterChips options={TYPE_FILTERS} value={mediaType} onChange={setMediaType} />
+          <FilterChips options={MEDIA_FILTERS} value={mediaType} onChange={setMediaType} />
         </div>
 
         {/* 결과 */}

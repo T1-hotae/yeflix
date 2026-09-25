@@ -107,11 +107,12 @@ async function setDocument(collection, docId, data) {
 
 /** 앱의 saveDiary()와 동일한 문서 구조로 일기를 심습니다. */
 async function seedDiary(uid, movie, diary) {
-  await setDocument('diaries', `${uid}_${movie.id}`, {
+  await setDocument('diaries', `${uid}_movie_${movie.id}`, {
     userId: uid,
-    movieId: movie.id,
-    movieTitle: movie.title,
-    moviePoster: movie.posterPath,
+    mediaType: 'movie',
+    itemId: movie.id,
+    title: movie.title,
+    poster: movie.posterPath,
     rating: diary.rating,
     content: diary.content,
     tags: diary.tags,
@@ -121,30 +122,20 @@ async function seedDiary(uid, movie, diary) {
   });
 }
 
-/**
- * 앱의 addToWatchlist()와 동일한 문서 구조로 찜을 심습니다.
- * 일부러 mediaType 없이 심어서, 드라마/책 추가 이전에 저장된 레거시 문서가
- * 여전히 "영화"로 인식되는지 함께 검증합니다.
- */
+/** 앱의 addToWatchlist()와 동일한 문서 구조로 영화 찜을 심습니다. */
 async function seedWatchlistItem(uid, movie) {
-  await setDocument('watchlist', `${uid}_${movie.id}`, {
-    userId: uid,
-    movieId: movie.id,
-    movieTitle: movie.title,
-    moviePoster: movie.posterPath,
-    addedAt: new Date('2026-09-10T12:00:00Z'),
-  });
+  await seedWatchlistMedia(uid, 'movie', movie);
 }
 
-/** 드라마/책 찜 (mediaType 접두어가 붙은 신규 문서 ID 형식) */
+/** 찜 문서 하나. 문서 ID는 타입에 예외 없이 {uid}_{mediaType}_{itemId} 입니다. */
 async function seedWatchlistMedia(uid, mediaType, item) {
   const itemId = mediaType === 'book' ? item.isbn : item.id;
   await setDocument('watchlist', `${uid}_${mediaType}_${itemId}`, {
     userId: uid,
     mediaType,
-    movieId: itemId,
-    movieTitle: item.title,
-    moviePoster: mediaType === 'book' ? item.thumbnail : item.posterPath,
+    itemId,
+    title: item.title,
+    poster: mediaType === 'book' ? item.thumbnail : item.posterPath,
     addedAt: new Date('2026-09-11T12:00:00Z'),
   });
 }
