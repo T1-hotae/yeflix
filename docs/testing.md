@@ -91,7 +91,7 @@ tests/
 ### 규칙 #6은 자동으로 대조된다
 
 `component/external-links.test.jsx`가 `BookLinks`·`WatchProviders`를 실제로 렌더해
-`<a href>` 호스트를 전부 모은 뒤, [`e2e/helpers/tmdb-mock.js`](../e2e/helpers/tmdb-mock.js)의
+`<a href>` 호스트를 전부 모은 뒤, [`e2e/helpers/tmdb-mock.mjs`](../e2e/helpers/tmdb-mock.mjs)의
 `EXTERNAL_HOSTS`와 비교한다. 서점·OTT를 추가하고 목킹 목록에 넣지 않으면
 E2E를 돌리기 전에 `npm test`가 빠진 호스트 이름을 찍어 준다.
 
@@ -121,7 +121,7 @@ E2E를 돌리기 전에 `npm test`가 빠진 호스트 이름을 찍어 준다.
 
 ## E2E와 겹치지 않게
 
-아래는 [`e2e/yeflix.spec.js`](../e2e/yeflix.spec.js)가 이미 커버하므로 Vitest로 다시 쓰지 않는다.
+아래는 [`e2e/yeflix.spec.mjs`](../e2e/yeflix.spec.mjs)가 이미 커버하므로 Vitest로 다시 쓰지 않는다.
 
 - 로그인 플로우, 헤더 계정 표시
 - 홈 탭 4개 구성, 탭 간 전환
@@ -165,7 +165,7 @@ RTL로 감싸면 목킹 비용이 소득을 넘는다. E2E에 맡긴다.
 ## 테스트를 추가할 때
 
 - 순수 함수를 새로 만들면 **`tests/unit`에 같이 넣는다.** 외부 의존이 없으므로 비용이 거의 없다.
-- 외부 링크(서점 · OTT)를 추가하면 `e2e/helpers/tmdb-mock.js`의 `EXTERNAL_HOSTS`에
+- 외부 링크(서점 · OTT)를 추가하면 `e2e/helpers/tmdb-mock.mjs`의 `EXTERNAL_HOSTS`에
   호스트를 넣는다. 빠뜨리면 `component/external-links.test.jsx`가 알려준다.
 - Firestore 래퍼에 조회 함수를 추가하면 `unit/firestore-shape.test.js`의
   `LIST_QUERIES` 배열에도 추가한다. 그래야 쿼리 형태 가드가 그 함수에도 적용된다.

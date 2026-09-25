@@ -136,7 +136,7 @@ ISBN 검색이 잘 안 먹어서 제목으로 보낸다.
 
 > 서점 검색 URL은 사이트 리뉴얼로 바뀐다. 실제로 밀리의 서재는 `/search`가 404라
 > `/v3/search`를 쓰고 있다. **링크를 추가·수정하면 브라우저로 한 번 열어서 확인할 것.**
-> 그리고 새 호스트는 [`e2e/helpers/tmdb-mock.js`](../e2e/helpers/tmdb-mock.js)의
+> 그리고 새 호스트는 [`e2e/helpers/tmdb-mock.mjs`](../e2e/helpers/tmdb-mock.mjs)의
 > `EXTERNAL_HOSTS`에 반드시 추가해야 테스트가 실제 사이트로 나가지 않는다.
 
 ## 메타데이터용 서버 호출
