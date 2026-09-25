@@ -1,5 +1,5 @@
-const { defineConfig, devices } = require('@playwright/test');
-const {
+import { defineConfig, devices } from '@playwright/test';
+import {
   BASE_URL,
   APP_PORT,
   AUTH_EMULATOR_URL,
@@ -7,7 +7,7 @@ const {
   AUTH_EMULATOR_PORT,
   FIRESTORE_EMULATOR_PORT,
   FIREBASE_PROJECT_ID,
-} = require('./e2e/helpers/constants');
+} from './e2e/helpers/constants.mjs';
 
 const CI = !!process.env.CI;
 
@@ -30,9 +30,10 @@ const appEnv = {
   KAKAO_REST_API_KEY: 'e2e-mocked-key',
 };
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './e2e',
-  globalSetup: require.resolve('./e2e/global-setup'),
+  // ESM에는 require.resolve가 없다. 설정 파일 기준 상대 경로를 그대로 넘긴다.
+  globalSetup: './e2e/global-setup.mjs',
 
   // 에뮬레이터 데이터를 공유하므로 직렬 실행
   fullyParallel: false,

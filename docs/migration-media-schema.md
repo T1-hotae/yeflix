@@ -52,7 +52,7 @@ typeOf(item) === 'movie'      // false → 영화 탭에서 사라짐
 
 ### ④ 테스트가 이 모순을 고정하고 있었다
 
-`e2e/helpers/emulator.js`가 *일부러* `mediaType` 없는 문서를 심어 레거시 호환을 검증했다.
+`e2e/helpers/emulator.mjs`가 *일부러* `mediaType` 없는 문서를 심어 레거시 호환을 검증했다.
 하위 호환이 테스트로 굳어 있으니 구조를 못 고치는 상태였다.
 
 ---
@@ -240,7 +240,7 @@ DB와 무관하지만 드라마 상세에서도 쓰이던 같은 성격의 잔�
 + <ProviderButton ... title={searchTitle} />
 ```
 
-### `e2e/helpers/emulator.js` — 레거시 검증이 사라진 자리
+### `e2e/helpers/emulator.mjs` — 레거시 검증이 사라진 자리
 
 가장 의미 있는 변화다. **하위 호환을 검증하던 시드가 없어졌다.**
 

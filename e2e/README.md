@@ -28,7 +28,7 @@ Firebase 에뮬레이터와 `next dev`는 Playwright가 알아서 띄우고 내�
 
 | # | 시나리오 | 파일 |
 | --- | --- | --- |
-| 1 | Google 계정으로 로그인하면 헤더에 내 계정이 뜬다 | [yeflix.spec.js](yeflix.spec.js) |
+| 1 | Google 계정으로 로그인하면 헤더에 내 계정이 뜬다 | [yeflix.spec.mjs](yeflix.spec.mjs) |
 | 2 | "내 일기" 탭에 그동안 작성한 일기가 뜬다 | 〃 |
 | 2-1 | `/diary` 페이지에서도 일기 내용·태그가 보인다 | 〃 |
 | 3 | "볼영화" 탭에 찜해 둔 영화가 뜬다 | 〃 |
@@ -42,25 +42,25 @@ Firebase 에뮬레이터와 `next dev`는 Playwright가 알아서 띄우고 내�
 실제 Google OAuth는 자동화가 막혀 있어 **Firebase Auth 에뮬레이터**를 씁니다.
 앱 코드(`signInWithPopup` → `onAuthStateChanged`)는 운영과 완전히 동일하게 타고,
 팝업만 Google 대신 에뮬레이터의 계정 선택 화면이 뜹니다.
-`global-setup.js`가 `google.com` 제공자 계정을 미리 만들어 두므로
-테스트는 목록에서 그 계정을 고르기만 합니다. → [helpers/login.js](helpers/login.js)
+`global-setup.mjs`가 `google.com` 제공자 계정을 미리 만들어 두므로
+테스트는 목록에서 그 계정을 고르기만 합니다. → [helpers/login.mjs](helpers/login.mjs)
 
 ### 데이터
 
-`global-setup.js`가 매 실행마다 에뮬레이터를 비우고,
+`global-setup.mjs`가 매 실행마다 에뮬레이터를 비우고,
 "이미 써 온 사용자" 상태를 Firestore REST API로 심습니다.
 
 - 일기 1건 — 파이트 클럽 (★5, 감상문, 태그 3개)
 - 찜 1건 — 인셉션
 
 생성된 uid는 `e2e/.state/seed.json`에 기록되어 워커로 전달됩니다.
-→ [helpers/emulator.js](helpers/emulator.js), [helpers/constants.js](helpers/constants.js)
+→ [helpers/emulator.mjs](helpers/emulator.mjs), [helpers/constants.mjs](helpers/constants.mjs)
 
 ### 외부 의존성
 
 TMDB API·이미지·OTT 사이트는 전부 컨텍스트 라우팅으로 가로챕니다.
 실제 네트워크를 타지 않으므로 API 키, 쿼터, 응답 변동에 흔들리지 않습니다.
-→ [helpers/tmdb-mock.js](helpers/tmdb-mock.js)
+→ [helpers/tmdb-mock.mjs](helpers/tmdb-mock.mjs)
 
 시나리오 5는 넷플릭스를 실제로 열지 않고 스텁 페이지로 응답한 뒤,
 새 탭의 URL이 `https://www.netflix.com/search?q=<영화 제목>`인지 확인합니다.
@@ -74,9 +74,9 @@ TMDB API·이미지·OTT 사이트는 전부 컨텍스트 라우팅으로 가로
 
 ## 데이터/영화를 바꾸고 싶다면
 
-[helpers/constants.js](helpers/constants.js)의 `DIARY_MOVIE`, `WATCHLIST_MOVIE`,
+[helpers/constants.mjs](helpers/constants.mjs)의 `DIARY_MOVIE`, `WATCHLIST_MOVIE`,
 `SEEDED_DIARY`만 고치면 시드와 단언이 함께 따라갑니다.
-새 영화를 쓸 땐 [helpers/tmdb-mock.js](helpers/tmdb-mock.js)의 `MOVIE_DETAILS`에도 추가하세요.
+새 영화를 쓸 땐 [helpers/tmdb-mock.mjs](helpers/tmdb-mock.mjs)의 `MOVIE_DETAILS`에도 추가하세요.
 
 ## 포트
 

@@ -7,17 +7,17 @@
 //  6~8. 볼영화 / 볼드라마 / 볼책 탭과 각 상세 페이지
 //  9~12. 타입별 검색 필터, 책 구매 링크, 일기 종류 필터, 책 일기 저장
 
-const { test, expect } = require('./fixtures');
-const { loginWithGoogle, openUserMenu } = require('./helpers/login');
-const { seedWatchlistMedia } = require('./helpers/emulator');
-const {
+import { test, expect } from './fixtures.mjs';
+import { loginWithGoogle, openUserMenu } from './helpers/login.mjs';
+import { seedWatchlistMedia } from './helpers/emulator.mjs';
+import {
   TEST_USER,
   DIARY_MOVIE,
   WATCHLIST_MOVIE,
   WATCHLIST_TV,
   WATCHLIST_BOOK,
   SEEDED_DIARY,
-} = require('./helpers/constants');
+} from './helpers/constants.mjs';
 
 const NETFLIX_SEARCH_URL = `https://www.netflix.com/search?q=${encodeURIComponent(
   DIARY_MOVIE.title,

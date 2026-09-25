@@ -1,14 +1,14 @@
 // Navbar의 "로그인" 버튼 → Google 팝업(Auth 에뮬레이터) → 계정 선택까지의 실제 흐름.
 
-const { expect } = require('@playwright/test');
-const { TEST_USER } = require('./constants');
+import { expect } from '@playwright/test';
+import { TEST_USER } from './constants.mjs';
 
 /**
  * 헤더의 로그인 버튼을 눌러 Google 계정으로 로그인합니다.
  * Auth 에뮬레이터는 실제 Google 대신 계정 선택 화면을 띄우고,
  * 그 외 앱 쪽 코드(signInWithPopup → onAuthStateChanged)는 운영과 동일하게 동작합니다.
  */
-async function loginWithGoogle(page) {
+export async function loginWithGoogle(page) {
   const loginButton = page.getByRole('button', { name: '로그인', exact: true });
   await expect(loginButton).toBeVisible();
 
@@ -43,12 +43,10 @@ async function loginWithGoogle(page) {
 }
 
 /** 헤더 프로필 드롭다운을 열고 메뉴 항목을 클릭합니다. */
-async function openUserMenu(page, itemName) {
+export async function openUserMenu(page, itemName) {
   await page.getByRole('button', { name: '사용자 메뉴' }).click();
 
   const menu = page.getByRole('menu', { name: '사용자 메뉴' });
   await expect(menu).toBeVisible();
   await menu.getByRole('menuitem', { name: itemName }).click();
 }
-
-module.exports = { loginWithGoogle, openUserMenu };
