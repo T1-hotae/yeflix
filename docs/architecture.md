@@ -62,9 +62,9 @@ src/
 ```js
 MEDIA_TYPES       // ['movie', 'tv', 'book']
 MEDIA_LABEL       // { movie: '영화', tv: '드라마', book: '책' }
-docKey(uid, type, id)   // Firestore 문서 ID
+MEDIA_FILTERS     // [{ value, label }] — 검색 필터 칩 목록
+docKey(uid, type, id)   // Firestore 문서 ID — "{uid}_{type}_{id}", 예외 없음
 mediaKey(type, id)      // "tv:1399" — 찜/일기 여부 판별용 합성 키
-typeOf(doc)             // mediaType 없으면 'movie' (레거시 문서 호환)
 detailHref(type, id)    // '/tv/1399'
 coerceId(type, id)      // 책은 문자열 ISBN, 나머지는 숫자
 ```

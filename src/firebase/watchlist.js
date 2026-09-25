@@ -10,7 +10,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './config';
-import { docKey, mediaKey, typeOf, coerceId } from '../lib/media';
+import { docKey, mediaKey, coerceId } from '../lib/media';
 
 const COLLECTION = 'watchlist';
 
@@ -20,9 +20,9 @@ export const addToWatchlist = async (userId, mediaType, itemId, itemData) => {
   await setDoc(doc(db, COLLECTION, id), {
     userId,
     mediaType,
-    movieId: coerceId(mediaType, itemId),
-    movieTitle: itemData.title,
-    moviePoster: itemData.poster ?? null,
+    itemId: coerceId(mediaType, itemId),
+    title: itemData.title,
+    poster: itemData.poster ?? null,
     addedAt: serverTimestamp(),
   });
 };
@@ -50,6 +50,6 @@ export const getWatchlistKeys = async (userId) => {
   const snap = await getDocs(q);
   return new Set(snap.docs.map((d) => {
     const data = d.data();
-    return mediaKey(typeOf(data), data.movieId);
+    return mediaKey(data.mediaType, data.itemId);
   }));
 };

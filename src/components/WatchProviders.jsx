@@ -32,9 +32,9 @@ const RING_COLOR = {
   "Amazon Prime Video": "hover:ring-cyan-400",
 };
 
-function ProviderButton({ provider, movieTitle, fallbackLink }) {
+function ProviderButton({ provider, title, fallbackLink }) {
   const getUrl = DIRECT_URL[provider.provider_id];
-  const href = getUrl ? getUrl(movieTitle) : fallbackLink;
+  const href = getUrl ? getUrl(title) : fallbackLink;
   const ringClass = RING_COLOR[provider.provider_name] ?? "hover:ring-white/40";
 
   return (
@@ -103,7 +103,7 @@ export default function WatchProviders({ providers, title }) {
               <ProviderButton
                 key={p.provider_id}
                 provider={p}
-                movieTitle={searchTitle}
+                title={searchTitle}
                 fallbackLink={link}
               />
             ))}
@@ -121,7 +121,7 @@ export default function WatchProviders({ providers, title }) {
               <ProviderButton
                 key={p.provider_id}
                 provider={p}
-                movieTitle={searchTitle}
+                title={searchTitle}
                 fallbackLink={link}
               />
             ))}
@@ -139,7 +139,7 @@ export default function WatchProviders({ providers, title }) {
               <ProviderButton
                 key={p.provider_id}
                 provider={p}
-                movieTitle={searchTitle}
+                title={searchTitle}
                 fallbackLink={link}
               />
             ))}

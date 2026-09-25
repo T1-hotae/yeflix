@@ -7,7 +7,7 @@ import { BookOpen, Film, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getMyDiaries } from '../../firebase/diary';
 import { getPosterUrl } from '../../api/tmdb';
-import { detailHref, typeOf, MEDIA_LABEL } from '../../lib/media';
+import { detailHref, MEDIA_LABEL } from '../../lib/media';
 import StarRating from '../../components/StarRating';
 
 export default function MyDiary() {
@@ -91,12 +91,12 @@ export default function MyDiary() {
             {filtered.map((diary) => (
               <div
                 key={diary.id}
-                onClick={() => router.push(detailHref(typeOf(diary), diary.movieId))}
+                onClick={() => router.push(detailHref(diary.mediaType, diary.itemId))}
                 className="flex gap-4 bg-cinema-card rounded-2xl p-4 border border-white/5 hover:border-white/10 cursor-pointer transition group"
               >
                 <div className="w-16 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-cinema-surface">
-                  {diary.moviePoster ? (
-                    <img src={getPosterUrl(diary.moviePoster, 'w92')} alt={diary.movieTitle} className="w-full h-full object-cover" />
+                  {diary.poster ? (
+                    <img src={getPosterUrl(diary.poster, 'w92')} alt={diary.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-cinema-muted">
                       <Film size={24} />
@@ -105,10 +105,10 @@ export default function MyDiary() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-white font-semibold group-hover:text-cinema-goldText transition line-clamp-1">{diary.movieTitle}</h3>
+                    <h3 className="text-white font-semibold group-hover:text-cinema-goldText transition line-clamp-1">{diary.title}</h3>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-cinema-muted">
-                        {MEDIA_LABEL[typeOf(diary)]}
+                        {MEDIA_LABEL[diary.mediaType]}
                       </span>
                       <StarRating value={diary.rating} readonly size="sm" />
                     </div>
